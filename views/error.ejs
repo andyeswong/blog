@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error - AWONG_blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="font-mono overflow-x-hidden" style="background-color: var(--body-bg); color: var(--fg);">
+  <!-- Nav Bar (sticky) -->
+  <nav class="sticky top-0 z-50 backdrop-blur-xl py-4 border-b" style="background-color: rgba(40, 42, 54, 0.8); border-color: var(--border-color);">
+    <div class="max-w-6xl mx-auto px-4 flex justify-center gap-8 sm:gap-16">
+      <a href="/" class="font-light tracking-[0.1em] hover:opacity-70 transition-all duration-300" style="color: var(--purple)">inicio</a>
+      <a href="/posts" class="font-light tracking-[0.1em] hover:opacity-70 transition-all duration-300" style="color: var(--purple)">artículos</a>
+      <a href="/about" class="font-light tracking-[0.1em] hover:opacity-70 transition-all duration-300" style="color: var(--purple)">acerca</a>
+    </div>
+  </nav>
+
+  <!-- Error Section -->
+  <section class="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-black px-4">
+    <div class="text-center z-10">
+      <!-- Error Code -->
+      <div class="mb-6">
+        <p class="text-6xl md:text-8xl font-light tracking-tight" style="color: #ff5555">!</p>
+      </div>
+
+      <!-- Error Message -->
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-6" style="color: #f8f8f2">
+        <%= typeof message !== 'undefined' ? message : 'Algo salió mal' %>
+      </h1>
+
+      <!-- Description -->
+      <p class="text-lg font-light mb-12 max-w-md" style="color: #b8a6db">
+        Lo sentimos, no pudimos procesar tu solicitud. Por favor intenta de nuevo o vuelve al inicio.
+      </p>
+
+      <!-- Divider -->
+      <div class="w-16 h-px mx-auto mb-12" style="background: linear-gradient(to right, transparent, #8be9fd, transparent)"></div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a 
+          href="/" 
+          class="px-8 py-3 border border-purple-500/30 rounded-lg hover:border-purple-500/60 font-light tracking-[0.1em] transition-all duration-300"
+          style="color: #8be9fd"
+        >
+          ir al inicio
+        </a>
+        <a 
+          href="/posts" 
+          class="px-8 py-3 border border-purple-500/30 rounded-lg hover:border-purple-500/60 font-light tracking-[0.1em] transition-all duration-300"
+          style="color: #8be9fd"
+        >
+          ver artículos
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <%- include('footer') %>
+
+  <script src="/theme.js"></script>
+  <script src="/glitch.js"></script>
+</body>
+</html>
