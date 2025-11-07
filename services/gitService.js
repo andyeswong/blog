@@ -25,11 +25,6 @@ async function initializeRepository() {
       return true;
     } catch (error) {
       // Not a git repo, initialize it
-      if (!REPO_URL) {
-        console.warn('⚠ POSTS_REPO_URL not set. Git repository not initialized.');
-        return false;
-      }
-
       console.log('Initializing posts repository...');
       execSync(`git clone ${REPO_URL} .`, {
         cwd: storageParent,
