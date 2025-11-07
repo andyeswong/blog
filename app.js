@@ -1,5 +1,8 @@
-require('dotenv').config();
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (error) {
+  // .env file optional - continue without it
+}
 const express = require('express');
 const path = require('path');
 const postService = require('./services/postService');
