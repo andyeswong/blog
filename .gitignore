@@ -27,10 +27,6 @@ yarn-error.log*
 .git-pull-cache
 .cache/
 
-# Posts (stored in separate GitHub repo)
-storage/posts/*
-!storage/posts/.gitkeep
-
 # OS
 Thumbs.db
 .DS_Store
