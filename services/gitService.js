@@ -53,7 +53,7 @@ async function pullLatestPosts() {
     if (!isInitialized) {
       return {
         success: false,
-        message: 'Repository not initialized. Set POSTS_REPO_URL environment variable.',
+        message: 'Failed to initialize posts repository. Check git permissions and network.',
         timestamp: new Date().toISOString()
       };
     }
