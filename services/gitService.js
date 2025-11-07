@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs').promises;
 
 const STORAGE_DIR = path.join(__dirname, '..', 'storage', 'posts');
-const REPO_URL = process.env.POSTS_REPO_URL || '';
+const REPO_URL = 'https://github.com/andyeswong/blog_posts.git';
 const GIT_TIMEOUT = 30000; // 30 seconds
 
 /**
