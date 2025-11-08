@@ -1,7 +1,7 @@
 {
-  "id": "002-charm-crush-deep-dive",
+  "id": "001-charm-crush",
   "title": "Charm Crush: Un Vistazo Técnico al Copiloto de IA en tu Terminal",
-  "slug": "charm-crush-deep-dive",
+  "slug": "charm-crush",
   "description": "Un análisis profundo de Charm Crush, explorando su integración con LSPs, configuración avanzada, y cómo transforma tu flujo de desarrollo con ejemplos prácticos.",
   "image_url": "https://private-user-images.githubusercontent.com/25087/471774478-58280caf-851b-470a-b6f7-d5c4ea8a1968.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjI1NjE1NDUsIm5iZiI6MTc2MjU2MTI0NSwicGF0aCI6Ii8yNTA4Ny80NzE3NzQ0NzgtNTgyODBjYWYtODUxYi00NzBhLWI2ZjctZDVjNGVhOGExOTY4LmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTExMDglMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMTA4VDAwMjA0NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTgyZWM2OGNhNWQyMTNhMzEyOWI2ZmQ1YmVlMzVjNmFjZGNlZDJmYzM5NjEyOTI2NzEzNTdjZGIzNjAxMzc5NGYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.jDEk-bSZrqZdJk1ukurElnyasUR4iNI3-pEsBe7DTx4",
   "tags": [
