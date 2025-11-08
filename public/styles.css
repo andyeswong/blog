@@ -255,6 +255,16 @@ nav a[href="/about"] {
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
   }
+
+  /* Hide site name and theme toggle on mobile */
+  nav > div > span,
+  .theme-toggle {
+    display: none;
+  }
+
+  nav > div > .w-px {
+    display: none;
+  }
 }
 
 /* ==================== THEME TRANSITIONS ==================== */
