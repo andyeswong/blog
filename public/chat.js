@@ -32,7 +32,6 @@ class PostAIChat {
         <!-- Header -->
         <div class="chat-header">
           <div class="chat-title-icon">
-            <span class="icon">🤖</span>
             <div class="title-text">
               <h3>Preguntas sobre el artículo</h3>
               <p class="subtitle">Powered by AI</p>

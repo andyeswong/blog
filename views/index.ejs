@@ -9,23 +9,18 @@
 </head>
 <body class="bg-black text-white font-mono overflow-x-hidden">
   <!-- Hero Section -->
-  <section class="hero-main min-h-screen w-full flex flex-col justify-center items-center relative overflow-hidden" style="background-color: var(--body-bg)">
-    <!-- Floating elements -->
-    <div class="floating-element" style="top: 25%; left: 15%; animation-delay: 5s"></div>
-    <div class="floating-element" style="top: 60%; left: 85%; animation-delay: 5.5s"></div>
-    <div class="floating-element" style="top: 40%; left: 10%; animation-delay: 6s"></div>
-    <div class="floating-element" style="top: 75%; left: 90%; animation-delay: 6.5s"></div>
+  <section class="hero-main min-h-screen w-full flex flex-col justify-center items-center relative overflow-hidden"  style="background-color: var(--body-bg)">
 
     <div class="relative z-10 w-full flex flex-col items-center justify-center">
       <!-- Navigation Menu - Dynamic Island Style -->
       <nav class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 mb-20">
-        <div class="flex items-center justify-center gap-4 px-6 py-3 backdrop-blur-xl rounded-full border transition-all duration-500" style="background-color: rgba(40, 42, 54, 0.6); border-color: var(--border-color);">
-          <span class="text-sm font-light tracking-[0.1em]" style="color: var(--cyan)">AWONG_blog</span>
+        <div class="flex items-center justify-center gap-4 px-6 py-3 rounded-lg w-100 transition-all duration-500">
+          <span class="text-sm font-light tracking-[0.1em]" >AWONG_blog</span>
           <div class="w-px h-6" style="background-color: var(--border-color)"></div>
           <div class="flex gap-1">
-            <a href="/" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full border" style="background-color: rgba(40, 42, 54, 0.8); border-color: var(--cyan); color: var(--cyan)">inicio</a>
-            <a href="/posts" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">artículos</a>
-            <a href="/about" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">acerca</a>
+            <a href="/" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-lg border" >inicio</a>
+            <a href="/posts" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-lg hover:bg-opacity-50" style="color: var(--purple)">artículos</a>
+            <a href="/about" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-lg hover:bg-opacity-50" style="color: var(--purple)">acerca</a>
           </div>
           <div class="w-px h-6" style="background-color: var(--border-color)"></div>
           <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"></button>
@@ -59,7 +54,6 @@
 
       <!-- Bottom tagline -->
       <div class="text-center mt-16">
-        <div class="mb-6 w-16 h-px mx-auto" style="background: linear-gradient(to right, transparent, var(--purple), transparent)"></div>
         <h2 class="text-xs md:text-sm font-mono font-light uppercase tracking-[0.2em] opacity-70" style="color: var(--purple)">
           <span class="word" data-delay="4200">Explorando</span>
           <span class="word" data-delay="4350">el</span>
@@ -67,18 +61,11 @@
           <span class="word" data-delay="4650">del</span>
           <span class="word" data-delay="4800">desarrollo.</span>
         </h2>
-        <div class="mt-6 flex justify-center space-x-4 opacity-0" style="animation: word-appear 1s ease-out forwards; animation-delay: 4.5s">
-          <div class="w-1 h-1 rounded-full opacity-40" style="background: var(--purple)"></div>
-          <div class="w-1 h-1 rounded-full opacity-60" style="background: var(--purple)"></div>
-          <div class="w-1 h-1 rounded-full opacity-40" style="background: var(--purple)"></div>
-        </div>
       </div>
     </div>
 
     <!-- Scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce" style="color: var(--purple)">
-      <div class="text-2xl">↓</div>
-    </div>
+   
   </section>
 
   <%- include('footer') %>

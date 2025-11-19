@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= post.title %> - AWONG_blog</title>
+  <title>
+    <%= post.title %> - AWONG_blog
+  </title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/styles.css">
   <style>
@@ -11,6 +14,7 @@
       transition: opacity 0.3s ease-in-out;
       opacity: 1;
     }
+
     nav.hidden-nav {
       opacity: 0;
       pointer-events: none;
@@ -20,22 +24,30 @@
       transition: opacity 0.3s ease-in-out;
       opacity: 1;
     }
+
     .sidebar.hidden-sidebar {
       opacity: 0;
       pointer-events: none;
     }
   </style>
 </head>
-<body class="font-mono overflow-x-hidden" style="background-color: var(--body-bg); color: var(--fg);" data-post-id="<%= post.id %>">
+
+<body class="font-mono overflow-x-hidden" style="background-color: var(--body-bg); color: var(--fg);"
+  data-post-id="<%= post.id %>">
   <!-- Dynamic Island Navbar -->
   <nav id="navbar" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-    <div class="flex items-center justify-center gap-4 px-6 py-3 backdrop-blur-xl rounded-full border transition-all duration-500" style="background-color: rgba(40, 42, 54, 0.6); border-color: var(--border-color);">
-      <span class="text-sm font-light tracking-[0.1em]" style="color: var(--cyan)">AWONG_blog</span>
+    <div class="flex items-center justify-center gap-4 px-6 py-3 rounded-lg w-100 transition-all duration-500">
+      <span class="text-sm font-light tracking-[0.1em]">AWONG_blog</span>
       <div class="w-px h-6" style="background-color: var(--border-color)"></div>
       <div class="flex gap-1">
-        <a href="/" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">inicio</a>
-        <a href="/posts" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full border" style="background-color: rgba(40, 42, 54, 0.8); border-color: var(--cyan); color: var(--cyan)">artículos</a>
-        <a href="/about" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">acerca</a>
+        <a href="/"
+          class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50"
+          style="color: var(--purple)">inicio</a>
+        <a href="/posts" class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-lg border"
+          >artículos</a>
+        <a href="/about"
+          class="px-6 py-2 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50"
+          style="color: var(--purple)">acerca</a>
       </div>
       <div class="w-px h-6" style="background-color: var(--border-color)"></div>
       <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"></button>
@@ -46,10 +58,10 @@
     let lastScrollY = 0;
     const navbar = document.getElementById('navbar');
     const sidebars = document.querySelectorAll('.sidebar');
-    
+
     window.addEventListener('scroll', () => {
       const currentScrollY = window.scrollY;
-      
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         // Scrolling down
         navbar.classList.add('hidden-nav');
@@ -59,7 +71,7 @@
         navbar.classList.remove('hidden-nav');
         sidebars.forEach(sidebar => sidebar.classList.remove('hidden-sidebar'));
       }
-      
+
       lastScrollY = currentScrollY;
     });
   </script>
@@ -73,232 +85,238 @@
           <div class="border border-purple-500/20 p-6 bg-[#282a36]/40 backdrop-blur-md rounded-lg">
             <h3 class="text-lg font-light mb-6 tracking-tight" style="color: #f8f8f2">posts_recientes</h3>
             <div class="space-y-4">
-              <% if (recentPosts && recentPosts.length > 0) { %>
-                <% recentPosts.slice(0, 5).forEach(recentPost => { %>
-                  <a 
-                    href="/posts/<%= recentPost.id %>"
-                    class="block group border-l-2 border-purple-500/20 pl-4 hover:border-purple-500/50 transition-all duration-300"
-                  >
-                    <h4 class="text-sm font-light line-clamp-2 mb-1 group-hover:text-green-300 transition-colors" style="color: var(--green)">
+              <% if (recentPosts && recentPosts.length> 0) { %>
+                <% recentPosts.slice(0, 5).forEach(recentPost=> { %>
+                  <a href="/posts/<%= recentPost.id %>"
+                    class="block group border-l-2 border-purple-500/20 pl-4 hover:border-purple-500/50 transition-all duration-300">
+                    <h4 class="text-sm font-light line-clamp-2 mb-1 group-hover:text-green-300 transition-colors"
+                      style="color: var(--green)">
                       <%= recentPost.title %>
                     </h4>
                     <p class="text-xs font-light" style="color: var(--comment)">
-                      <%= new Date(recentPost.metadata.created_time).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                      <%= new Date(recentPost.metadata.created_time).toLocaleDateString('es-ES', { year: 'numeric' ,
+                        month: 'short' , day: 'numeric' }) %>
                     </p>
                   </a>
-                <% }); %>
-              <% } %>
+                  <% }); %>
+                    <% } %>
             </div>
           </div>
         </aside>
 
         <!-- Center: Main Content (2 columns span) -->
         <div class="lg:col-span-2">
-      <!-- Breadcrumb -->
-      <div class="mb-8 flex items-center gap-3 text-sm font-light" style="color: var(--purple)">
-        <a href="/posts" class="hover:text-purple-200 transition-colors">artículos</a>
-        <span>/</span>
-        <span class="truncate"><%= post.title.substring(0, 40) %>...</span>
-      </div>
-
-      <!-- Header -->
-      <header class="mb-12">
-        <!-- Tags -->
-        <div class="mb-4 flex flex-wrap gap-2">
-          <% post.tags.forEach(tag => { %>
-            <a 
-              href="/posts/tag/<%= tag %>"
-              class="px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded text-sm font-light hover:bg-purple-500/20 transition-colors"
-              style="color: var(--purple)"
-            >
-              #<%= tag %>
-            </a>
-          <% }); %>
-        </div>
-
-        <!-- Title -->
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight mb-6" style="color: var(--fg)">
-          <%= post.title %>
-        </h1>
-
-        <!-- Meta Info -->
-        <div class="flex flex-wrap gap-6 text-sm font-light mb-8" style="color: var(--comment)">
-          <time datetime="<%= post.metadata.created_time %>">
-            <%= new Date(post.metadata.created_time).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %>
-          </time>
-          <span><%= post.author || 'AWONG' %></span>
-          <% if (post.reading_time) { %>
-            <span><%= post.reading_time %> minutos de lectura</span>
-          <% } %>
-          <span><%= post.views || 0 %> vistas</span>
-        </div>
-
-        <!-- Description -->
-        <p class="text-lg font-light leading-relaxed mb-8" style="color: var(--purple)">
-          <%= post.description %>
-        </p>
-
-        <!-- Featured Image -->
-        <% if (post.image_url) { %>
-          <img 
-            src="<%= post.image_url %>" 
-            alt="<%= post.title %>"
-            class="w-full h-96 object-cover rounded-lg mb-12 opacity-70 hover:opacity-80 transition-opacity duration-500"
-          />
-        <% } %>
-      </header>
-
-      <!-- Content -->
-      <div class="mb-16 prose prose-invert max-w-none" style="color: var(--fg)">
-        <style>
-          .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4, .prose-invert h5, .prose-invert h6 {
-            color: var(--green);
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-            font-weight: 300;
-          }
-
-          .prose-invert h1 {
-            font-size: 2em;
-          }
-
-          .prose-invert h2 {
-            font-size: 1.75em;
-          }
-
-          .prose-invert h3 {
-            font-size: 1.5em;
-          }
-
-          .prose-invert p {
-            margin-bottom: 1em;
-            line-height: 1.75;
-          }
-
-          .prose-invert ul, .prose-invert ol {
-            margin-left: 1.5em;
-            margin-bottom: 1em;
-          }
-
-          .prose-invert li {
-            margin-bottom: 0.5em;
-          }
-
-          .prose-invert a {
-            color: #8be9fd;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(139, 233, 253, 0.3);
-            transition: all 0.3s ease;
-          }
-
-          .prose-invert a:hover {
-            color: #a0f2ff;
-            border-bottom-color: rgba(139, 233, 253, 0.8);
-          }
-
-          .prose-invert pre {
-            background-color: rgba(40, 42, 54, 0.6);
-            border: 1px solid rgba(139, 233, 253, 0.2);
-            border-radius: 0.5em;
-            padding: 1em;
-            overflow-x: auto;
-            margin-bottom: 1em;
-          }
-
-          .prose-invert code {
-            color: #8be9fd;
-            font-size: 0.9em;
-          }
-
-          .prose-invert pre code {
-            background: none;
-          }
-
-          .prose-invert blockquote {
-            color: #b8a6db;
-            border-left: 3px solid #8be9fd;
-            padding-left: 1em;
-            margin-left: 0;
-            margin-bottom: 1em;
-          }
-
-          .prose-invert table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 1em;
-          }
-
-          .prose-invert thead {
-            background-color: rgba(40, 42, 54, 0.4);
-          }
-
-          .prose-invert th, .prose-invert td {
-            border: 1px solid rgba(139, 233, 253, 0.2);
-            padding: 0.75em;
-            text-align: left;
-          }
-
-          .prose-invert strong {
-            color: #50fa7b;
-          }
-
-          .prose-invert em {
-            color: #8be9fd;
-          }
-        </style>
-        <%- post.content %>
-      </div>
-
-      <!-- Divider -->
-      <div class="my-16 h-px" style="background: linear-gradient(to right, transparent, #8be9fd, transparent)"></div>
-
-      <!-- Related Posts -->
-      <% if (relatedPosts.length > 0) { %>
-        <section class="mb-12">
-          <h2 class="text-2xl font-light tracking-tight mb-8" style="color: #f8f8f2">artículos_relacionados</h2>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <% relatedPosts.forEach(relatedPost => { %>
-              <a 
-                href="/posts/<%= relatedPost.id %>"
-                class="group border border-purple-500/20 p-6 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 hover:bg-[#282a36]/60 transition-all duration-500 block"
-              >
-                <% if (relatedPost.image_url) { %>
-                  <img 
-                    src="<%= relatedPost.image_url %>" 
-                    alt="<%= relatedPost.title %>"
-                    class="w-full h-32 object-cover rounded-lg mb-4 opacity-60 group-hover:opacity-80 transition-opacity"
-                  />
-                <% } %>
-                
-                <h3 class="font-light mb-2 line-clamp-2 group-hover:text-green-300 transition-colors" style="color: #50fa7b">
-                  <%= relatedPost.title %>
-                </h3>
-                
-                <p class="text-sm font-light line-clamp-2" style="color: #6272a4">
-                  <%= relatedPost.description %>
-                </p>
-              </a>
-            <% }); %>
+          <!-- Breadcrumb -->
+          <div class="mb-8 flex items-center gap-3 text-sm font-light" style="color: var(--purple)">
+            <a href="/posts" class="hover:text-purple-200 transition-colors">artículos</a>
+            <span>/</span>
+            <span class="truncate">
+              <%= post.title.substring(0, 40) %>...
+            </span>
           </div>
-        </section>
-      <% } %>
 
-      <!-- Back to Posts -->
-      <div class="text-center py-8">
-        <a 
-          href="/posts" 
-          class="font-light tracking-[0.1em] hover:text-purple-200 transition-colors"
-          style="color: #8be9fd"
-        >
-          ← volver a artículos
-        </a>
-      </div>
+          <!-- Header -->
+          <header class="mb-12">
+            <!-- Tags -->
+            <div class="mb-4 flex flex-wrap gap-2">
+              <% post.tags.forEach(tag=> { %>
+                <a href="/posts/tag/<%= tag %>"
+                  class="px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded text-sm font-light hover:bg-purple-500/20 transition-colors"
+                  style="color: var(--purple)">
+                  #<%= tag %>
+                </a>
+                <% }); %>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight mb-6"
+              style="color: var(--fg)">
+              <%= post.title %>
+            </h1>
+
+            <!-- Meta Info -->
+            <div class="flex flex-wrap gap-6 text-sm font-light mb-8" style="color: var(--comment)">
+              <time datetime="<%= post.metadata.created_time %>">
+                <%= new Date(post.metadata.created_time).toLocaleDateString('es-ES', { year: 'numeric' , month: 'long' ,
+                  day: 'numeric' }) %>
+              </time>
+              <span>
+                <%= post.author || 'AWONG' %>
+              </span>
+              <% if (post.reading_time) { %>
+                <span>
+                  <%= post.reading_time %> minutos de lectura
+                </span>
+                <% } %>
+                  <span>
+                    <%= post.views || 0 %> vistas
+                  </span>
+            </div>
+
+            <!-- Description -->
+            <p class="text-lg font-light leading-relaxed mb-8" style="color: var(--purple)">
+              <%= post.description %>
+            </p>
+
+            <!-- Featured Image -->
+            <% if (post.image_url) { %>
+              <img src="<%= post.image_url %>" alt="<%= post.title %>"
+                class="w-full h-96 object-cover rounded-lg mb-12 opacity-70 hover:opacity-80 transition-opacity duration-500" />
+              <% } %>
+          </header>
+
+          <!-- Content -->
+          <div class="mb-16 prose prose-invert max-w-none" style="color: var(--fg)">
+            <style>
+              .prose-invert h1,
+              .prose-invert h2,
+              .prose-invert h3,
+              .prose-invert h4,
+              .prose-invert h5,
+              .prose-invert h6 {
+                color: var(--green);
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+                font-weight: 300;
+              }
+
+              .prose-invert h1 {
+                font-size: 2em;
+              }
+
+              .prose-invert h2 {
+                font-size: 1.75em;
+              }
+
+              .prose-invert h3 {
+                font-size: 1.5em;
+              }
+
+              .prose-invert p {
+                margin-bottom: 1em;
+                line-height: 1.75;
+              }
+
+              .prose-invert ul,
+              .prose-invert ol {
+                margin-left: 1.5em;
+                margin-bottom: 1em;
+              }
+
+              .prose-invert li {
+                margin-bottom: 0.5em;
+              }
+
+              .prose-invert a {
+                color: #8be9fd;
+                text-decoration: none;
+                border-bottom: 1px solid rgba(139, 233, 253, 0.3);
+                transition: all 0.3s ease;
+              }
+
+              .prose-invert a:hover {
+                color: #a0f2ff;
+                border-bottom-color: rgba(139, 233, 253, 0.8);
+              }
+
+              .prose-invert pre {
+                background-color: rgba(40, 42, 54, 0.6);
+                border: 1px solid rgba(139, 233, 253, 0.2);
+                border-radius: 0.5em;
+                padding: 1em;
+                overflow-x: auto;
+                margin-bottom: 1em;
+              }
+
+              .prose-invert code {
+                color: #8be9fd;
+                font-size: 0.9em;
+              }
+
+              .prose-invert pre code {
+                background: none;
+              }
+
+              .prose-invert blockquote {
+                color: #b8a6db;
+                border-left: 3px solid #8be9fd;
+                padding-left: 1em;
+                margin-left: 0;
+                margin-bottom: 1em;
+              }
+
+              .prose-invert table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 1em;
+              }
+
+              .prose-invert thead {
+                background-color: rgba(40, 42, 54, 0.4);
+              }
+
+              .prose-invert th,
+              .prose-invert td {
+                border: 1px solid rgba(139, 233, 253, 0.2);
+                padding: 0.75em;
+                text-align: left;
+              }
+
+              .prose-invert strong {
+                color: #50fa7b;
+              }
+
+              .prose-invert em {
+                color: #8be9fd;
+              }
+            </style>
+            <%- post.content %>
+          </div>
+
+          <!-- Divider -->
+          <div class="my-16 h-px" style="background: linear-gradient(to right, transparent, #8be9fd, transparent)">
+          </div>
+
+          <!-- Related Posts -->
+          <% if (relatedPosts.length> 0) { %>
+            <section class="mb-12">
+              <h2 class="text-2xl font-light tracking-tight mb-8" style="color: #f8f8f2">artículos_relacionados</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% relatedPosts.forEach(relatedPost=> { %>
+                  <a href="/posts/<%= relatedPost.id %>"
+                    class="group border border-purple-500/20 p-6 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 hover:bg-[#282a36]/60 transition-all duration-500 block">
+                    <% if (relatedPost.image_url) { %>
+                      <img src="<%= relatedPost.image_url %>" alt="<%= relatedPost.title %>"
+                        class="w-full h-32 object-cover rounded-lg mb-4 opacity-60 group-hover:opacity-80 transition-opacity" />
+                      <% } %>
+
+                        <h3 class="font-light mb-2 line-clamp-2 group-hover:text-green-300 transition-colors"
+                          style="color: #50fa7b">
+                          <%= relatedPost.title %>
+                        </h3>
+
+                        <p class="text-sm font-light line-clamp-2" style="color: #6272a4">
+                          <%= relatedPost.description %>
+                        </p>
+                  </a>
+                  <% }); %>
+              </div>
+            </section>
+            <% } %>
+
+              <!-- Back to Posts -->
+              <div class="text-center py-8">
+                <a href="/posts" class="font-light tracking-[0.1em] hover:text-purple-200 transition-colors"
+                  style="color: #8be9fd">
+                  ← volver a artículos
+                </a>
+              </div>
         </div>
 
         <!-- Right Sidebar: AI Chat (Hidden on mobile) -->
-        <aside class="sidebar hidden lg:block lg:sticky lg:top-28 lg:h-fit">
-          <div id="ai-chat-container" style="height: 600px;"></div>
+        <aside class="sidebar hidden lg:block lg:fixed bottom-1 right-1 w-96 h-screen ">
+          <div id="ai-chat-container" style="height:100%;"></div>
         </aside>
       </div>
     </div>
@@ -306,8 +324,9 @@
 
   <%- include('footer') %>
 
-  <script src="/theme.js"></script>
-  <script src="/glitch.js"></script>
-  <script src="/chat.js"></script>
+    <script src="/theme.js"></script>
+    <script src="/glitch.js"></script>
+    <script src="/chat.js"></script>
 </body>
+
 </html>

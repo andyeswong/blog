@@ -177,13 +177,10 @@ body {
   50% { transform: skew(-1deg); opacity: 0.5; }
 }
 
-/* ==================== NAVBAR ==================== */
 
 /* ==================== NAVBAR ==================== */
 
-nav > div {
-  background-color: rgba(40, 42, 54, 0.6) !important;
-}
+
 
 :root[data-theme="light"] nav > div {
   background-color: var(--bg-secondary) !important;
@@ -200,13 +197,6 @@ nav a:hover {
   opacity: 0.8;
 }
 
-/* Active state styling */
-nav a[href="/posts"],
-nav a[href="/posts/"],
-nav a[href="/about"] {
-  background-color: rgba(40, 42, 54, 0.8) !important;
-  border-color: var(--cyan);
-}
 
 :root[data-theme="light"] nav a[href="/posts"],
 :root[data-theme="light"] nav a[href="/posts/"],
@@ -290,7 +280,6 @@ nav a[href="/about"] {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
