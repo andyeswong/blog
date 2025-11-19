@@ -397,7 +397,6 @@ nav a:hover {
 }
 
 .chat-message-ai .message-content {
-  background: #ffffff;
   color: var(--fg);
   border: 1px solid var(--border-color);
   border-radius: 12px 12px 12px 4px;

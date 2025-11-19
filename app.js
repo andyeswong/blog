@@ -6,7 +6,6 @@ try {
 const express = require('express');
 const path = require('path');
 const postService = require('./services/postService');
-const gitService = require('./services/gitService');
 const difyService = require('./services/difyService');
 const app = express();
 
@@ -15,20 +14,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Initialize git repository on startup
-gitService.initializeRepository().catch(err => 
-  console.error('Failed to initialize git repository:', err)
-);
-
 // Rutas
-app.get('/', async (req, res) => {
-  try {
-    // Pull latest posts from GitHub
-    await gitService.smartPull({ minInterval: 2 * 60 * 1000 }); // 2 minute throttle
-  } catch (error) {
-    console.error('Error pulling posts:', error);
-    // Continue anyway, use existing posts
-  }
+app.get('/', (req, res) => {
   res.render('index');
 });
 
@@ -167,42 +154,6 @@ app.get('/api/posts', async (req, res) => {
 // Página Acerca de
 app.get('/about', (req, res) => {
   res.render('about');
-});
-
-// API: Manual pull from GitHub (force refresh posts)
-app.post('/api/pull-posts', async (req, res) => {
-  try {
-    const result = await gitService.pullLatestPosts();
-    if (result.success) {
-      await gitService.setLastPullTime();
-    }
-    res.json(result);
-  } catch (error) {
-    console.error('Error pulling posts:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error pulling posts',
-      error: error.message
-    });
-  }
-});
-
-// GET version for testing (same as POST)
-app.get('/api/pull-posts', async (req, res) => {
-  try {
-    const result = await gitService.pullLatestPosts();
-    if (result.success) {
-      await gitService.setLastPullTime();
-    }
-    res.json(result);
-  } catch (error) {
-    console.error('Error pulling posts:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error pulling posts',
-      error: error.message
-    });
-  }
 });
 
 // API: Chat with AI about post

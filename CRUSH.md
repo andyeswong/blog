@@ -8,6 +8,7 @@
 - Dracula color scheme UI
 - Post search, filtering by tags, and pagination
 - RESTful API endpoints for posts and stats
+- AI chat integration with Dify for post-specific conversations
 
 **Technology Stack**: Node.js, Express 5.1, EJS 3.1, Tailwind CSS, vanilla JavaScript
 
@@ -38,18 +39,21 @@ blog/
 ├── app.js                      # Express server and route definitions
 ├── package.json                # Dependencies and scripts
 ├── services/
-│   └── postService.js          # All post-related business logic
+│   ├── postService.js          # All post-related business logic
+│   └── difyService.js          # AI chat API integration
 ├── views/                      # EJS templates
 │   ├── index.ejs              # Landing page (hero section + animations)
 │   ├── posts.ejs              # Posts list, search, and tag filtering
-│   ├── post-detail.ejs        # Individual post view with related posts
+│   ├── post-detail.ejs        # Individual post view with AI chat
+│   ├── about.ejs              # About page
 │   └── error.ejs              # Error page (404/500)
 ├── public/
 │   ├── styles.css             # Global styles and Dracula theme CSS
+│   ├── theme.js               # Dark/light theme toggle
+│   ├── chat.js                # AI chat UI controller
 │   └── glitch.js              # Client-side animations (hero section only)
 ├── storage/
-│   └── posts/                 # JSON files for blog posts (no database)
-├── DESIGN_SYSTEM.md           # Complete UI/UX design documentation
+│   └── posts/                 # JSON files for blog posts
 ├── POSTS_STRUCTURE.md         # Post JSON schema and validation rules
 └── ROUTES.md                  # Detailed API and route documentation
 ```
@@ -63,15 +67,15 @@ blog/
 Posts are stored as individual JSON files in `storage/posts/` with naming convention:
 ```
 {3-digit-number}-{slug}.json
-Example: 001-introduccion-nodejs.json
+Example: 001-charm-crush.json
 ```
 
 **Post JSON Structure** (required fields):
 ```javascript
 {
-  id: "001-introduccion-nodejs",              // Unique identifier
+  id: "001-charm-crush",                     // Unique identifier
   title: "Título del Artículo",              // Post title
-  slug: "introduccion-nodejs",               // URL-friendly slug
+  slug: "charm-crush",                       // URL-friendly slug
   description: "Brief description...",       // 50-160 characters
   tags: ["node.js", "backend", "api"],       // Array of categories
   author: "AWONG",                           // Author name
@@ -111,6 +115,11 @@ incrementPostViews(id) // Increments views + updates modification_time, writes t
 getPostsStats()        // Returns {total, totalViews, totalTags, averageViews, newestPost, mostViewedPost}
 ```
 
+`services/difyService.js` provides AI chat functionality:
+```javascript
+sendMessage({query, post, conversationId})  // Send message to Dify AI with post context
+```
+
 **Async Handling**: All service functions wrap file operations in try-catch with console.error logging. Errors return empty arrays or null, not thrown errors. This prevents server crashes but silently fails.
 
 ### EJS Template Patterns
@@ -123,7 +132,7 @@ All views use:
 
 **Key Variables Passed to Views**:
 - `posts.ejs`: `posts`, `currentPage`, `totalPages`, `totalPosts`, `tags`, `searchQuery`, `selectedTag`
-- `post-detail.ejs`: `post`, `relatedPosts`
+- `post-detail.ejs`: `post`, `relatedPosts`, `recentPosts`
 - `index.ejs`: No variables (static landing page)
 - `error.ejs`: `message`
 
@@ -157,6 +166,7 @@ Error messages are in Spanish (es_ES locale). Route always renders `error.ejs` f
 | `GET` | `/posts/:id` | Single post (increments views, shows related) |
 | `GET` | `/posts/tag/:tag` | Filter posts by tag |
 | `GET` | `/search?q=term` | Search posts by title/description/tags |
+| `GET` | `/about` | About page |
 
 ### API Routes (JSON Response)
 
@@ -164,17 +174,52 @@ Error messages are in Spanish (es_ES locale). Route always renders `error.ejs` f
 |--------|-------|---------|
 | `GET` | `/api/posts` | All posts as JSON array |
 | `GET` | `/api/stats` | Blog statistics object |
+| `POST` | `/api/chat` | AI chat about a post |
 
 ### Special Routes
 
-- `GET` `/about` - Returns 404 (route defined but not implemented)
 - `GET` `/*` - Catch-all 404 handler
+
+---
+
+## AI Chat Integration
+
+### Dify Service
+
+The blog includes AI chat functionality powered by Dify. Each post detail page has a chat sidebar where users can ask questions about the post.
+
+**Request Flow**:
+1. User sends message via chat UI
+2. `chat.js` sends POST to `/api/chat`
+3. `app.js` gets post context from `postService`
+4. `difyService.sendMessage()` calls Dify API with post context
+5. Response returned with markdown formatting
+
+**API Request Format**:
+```javascript
+{
+  query: "user question",
+  postId: "001-charm-crush",
+  conversationId: null  // null for first message, then use returned ID
+}
+```
+
+**API Response Format**:
+```javascript
+{
+  success: true,
+  answer: "## Response\n**Bold text**...",
+  conversation_id: "abc-123-xyz",
+  message_id: "msg-456",
+  metadata: { usage: { tokens: 1161 } }
+}
+```
 
 ---
 
 ## Design System & Frontend
 
-**Dracula Color Scheme** (defined in `styles.css` and `DESIGN_SYSTEM.md`):
+**Dracula Color Scheme** (defined in `styles.css`):
 ```
 --dracula-bg: #282a36           (page background)
 --dracula-fg: #f8f8f2           (text primary)
@@ -237,6 +282,9 @@ Search is **empty-string safe**: `/search?q=` returns empty array (no error).
 ### 9. Port Configuration
 Server port defaults to `process.env.PORT || 3000`. Set `PORT` env var to override.
 
+### 10. AI Chat Context
+The chat system sends the entire post object as context to Dify AI, allowing contextual responses about the specific article.
+
 ---
 
 ## Common Tasks & How-To
@@ -258,9 +306,8 @@ Server port defaults to `process.env.PORT || 3000`. Set `PORT` env var to overri
 ### Change Design/Colors
 
 1. Edit `styles.css` for color variables and animations
-2. Edit `DESIGN_SYSTEM.md` if documenting changes
-3. Use Dracula palette defined in CSS custom properties
-4. Tailwind classes in templates for spacing/layout
+2. Use Dracula palette defined in CSS custom properties
+3. Tailwind classes in templates for spacing/layout
 
 ### Add New Route
 
@@ -281,8 +328,9 @@ Server port defaults to `process.env.PORT || 3000`. Set `PORT` env var to overri
 
 ```json
 {
-  "ejs": "^3.1.10",           // Server-side templating
-  "express": "^5.1.0"          // Web framework
+  "dotenv": "^17.2.3",          // Environment variables (optional)
+  "ejs": "^3.1.10",             // Server-side templating
+  "express": "^5.1.0"           // Web framework
 }
 ```
 
@@ -312,6 +360,7 @@ For high traffic, consider:
 - No rate limiting on views or search
 - JSON files are readable/writable by Node process
 - Ensure `storage/posts/` has proper file permissions
+- HTML escaping in chat messages (XSS prevention)
 
 ---
 
@@ -333,13 +382,11 @@ From ROUTES.md future features:
 - [ ] POST/PUT/DELETE endpoints for CRUD operations
 - [ ] Advanced filtering and sorting
 - [ ] Comment system
-- [ ] About page implementation
 - [ ] Pagination in search results
 
 ---
 
 ## Reference Documentation
 
-- **DESIGN_SYSTEM.md**: Complete UI/UX specifications, colors, typography, animations
 - **POSTS_STRUCTURE.md**: Post JSON schema, validation rules, scalability notes
 - **ROUTES.md**: Detailed route definitions with examples and use flows

@@ -12,7 +12,7 @@ Este documento describe todas las rutas disponibles en la aplicación AWONG_blog
 
 **Parámetros**: Ninguno
 
-**Respuesta**: Renderiza la página principal con animaciones hero y preview de artículos recientes
+**Respuesta**: Renderiza la página principal con animaciones hero
 
 ```
 GET http://localhost:3000/
@@ -51,20 +51,22 @@ GET http://localhost:3000/posts?page=3
 
 **Parámetros URL**:
 - `id` (required): ID único del post (sin extensión .json)
-  - Ejemplo: `001-introduccion-nodejs`
+  - Ejemplo: `001-charm-crush`
 
 **Funcionalidades**:
 - Renderiza contenido HTML completo del post
 - Incrementa contador de vistas automáticamente
 - Muestra posts relacionados (basados en tags)
+- Muestra posts recientes en sidebar
+- Chat AI para preguntas sobre el post
 - Información completa del post (autor, fecha, vistas, etc.)
 
 **Respuesta en Caso de Error**: 
 - Si el post no existe: Error 404 con mensaje "Artículo no encontrado"
 
 ```
-GET http://localhost:3000/posts/001-introduccion-nodejs
-GET http://localhost:3000/posts/002-arquitectura-microservicios
+GET http://localhost:3000/posts/001-charm-crush
+GET http://localhost:3000/posts/002-vibecoding-economico
 ```
 
 ---
@@ -86,7 +88,7 @@ GET http://localhost:3000/posts/002-arquitectura-microservicios
 ```
 GET http://localhost:3000/posts/tag/node.js
 GET http://localhost:3000/posts/tag/backend
-GET http://localhost:3000/posts/tag/javascript
+GET http://localhost:3000/posts/tag/ai
 ```
 
 ---
@@ -109,15 +111,15 @@ GET http://localhost:3000/posts/tag/javascript
 ```
 GET http://localhost:3000/search?q=node.js
 GET http://localhost:3000/search?q=API
-GET http://localhost:3000/search?q=backend
+GET http://localhost:3000/search?q=ai
 ```
 
 ---
 
 ### GET `/about`
-**Descripción**: Página de información (aún no implementada)
+**Descripción**: Página de información sobre el autor/blog
 
-**Estado**: En desarrollo
+**Vista**: `views/about.ejs`
 
 ```
 GET http://localhost:3000/about
@@ -137,11 +139,11 @@ GET http://localhost:3000/about
 ```json
 [
   {
-    "id": "001-introduccion-nodejs",
-    "title": "Introducción a Node.js y Express",
-    "slug": "introduccion-nodejs",
-    "description": "Aprende los fundamentos...",
-    "tags": ["node.js", "express", "backend"],
+    "id": "001-charm-crush",
+    "title": "Charm Crush: Un Vistazo Técnico...",
+    "slug": "charm-crush",
+    "description": "Un análisis profundo...",
+    "tags": ["charm crush", "ai", "terminal"],
     "author": "AWONG",
     "metadata": {...},
     ...
@@ -165,10 +167,10 @@ GET http://localhost:3000/api/posts
 
 ```json
 {
-  "total": 5,
-  "totalViews": 1234,
+  "total": 3,
+  "totalViews": 150,
   "totalTags": 12,
-  "averageViews": 247,
+  "averageViews": 50,
   "newestPost": {...},
   "mostViewedPost": {...}
 }
@@ -177,6 +179,57 @@ GET http://localhost:3000/api/posts
 **Ejemplo**:
 ```
 GET http://localhost:3000/api/stats
+```
+
+---
+
+### POST `/api/chat`
+**Descripción**: Chat con AI sobre un post específico
+
+**Parámetros Body** (JSON):
+- `query` (required): Pregunta del usuario
+- `postId` (required): ID del post para contexto
+- `conversationId` (optional): ID de conversación para seguimiento
+
+**Request**:
+```json
+{
+  "query": "¿De qué trata este artículo?",
+  "postId": "001-charm-crush",
+  "conversationId": null
+}
+```
+
+**Respuesta Exitosa**:
+```json
+{
+  "success": true,
+  "answer": "## Respuesta\n\nEste artículo trata sobre...",
+  "conversation_id": "abc-123-xyz",
+  "message_id": "msg-456",
+  "metadata": {
+    "usage": { "tokens": 1161 }
+  }
+}
+```
+
+**Respuesta de Error**:
+```json
+{
+  "success": false,
+  "error": "Post not found"
+}
+```
+
+**Ejemplo**:
+```bash
+curl -X POST http://localhost:3000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What is this post about?",
+    "postId": "001-charm-crush",
+    "conversationId": null
+  }'
 ```
 
 ---
@@ -241,6 +294,17 @@ getPostsStats() -> Promise<Object>
 
 ---
 
+## Funciones del Servicio de AI
+
+Estas funciones están en `services/difyService.js`:
+
+```javascript
+// Envía mensaje a Dify AI con contexto del post
+sendMessage({query, post, conversationId}) -> Promise<Object>
+```
+
+---
+
 ## Flujo de Uso
 
 ### Leer un artículo
@@ -249,7 +313,7 @@ getPostsStats() -> Promise<Object>
 2. Usuario hace clic en un artículo
 3. Sistema redirige a `/posts/{id}`
 4. Contador de vistas se incrementa automáticamente
-5. Se muestran artículos relacionados
+5. Se muestran artículos relacionados y recientes
 
 ### Filtrar por etiqueta
 
@@ -265,13 +329,22 @@ getPostsStats() -> Promise<Object>
 3. Sistema redirige a `/search?q={término}`
 4. Se muestran posts coincidentes
 
+### Usar chat AI
+
+1. Usuario navega a un post específico
+2. En el sidebar derecho aparece el chat AI
+3. Usuario escribe pregunta sobre el post
+4. Sistema envía pregunta a `/api/chat`
+5. AI responde con contexto del post
+6. Conversación se mantiene con `conversation_id`
+
 ---
 
 ## Convenciones
 
 ### IDs de Posts
 - Formato: `{numero}-{slug}`
-- Ejemplo: `001-introduccion-nodejs`
+- Ejemplo: `001-charm-crush`
 - Se usa directamente en URL (sin extensión .json)
 
 ### Parámetros Query
@@ -280,6 +353,7 @@ getPostsStats() -> Promise<Object>
 - Múltiples valores separados por `&`
 
 ### Respuestas de Error
+- Status code: 400 para parámetros faltantes
 - Status code: 404 para post no encontrado
 - Status code: 500 para errores del servidor
 - Se renderiza vista `error.ejs` con mensaje
@@ -292,7 +366,6 @@ getPostsStats() -> Promise<Object>
 - [ ] Ruta para editar post (`PUT /api/posts/:id`)
 - [ ] Ruta para eliminar post (`DELETE /api/posts/:id`)
 - [ ] Autenticación de admin
-- [ ] Página `/about` implementada
 - [ ] Paginación en búsqueda
 - [ ] Filtros avanzados
 - [ ] API de comentarios

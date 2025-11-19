@@ -11,7 +11,6 @@
 - **Dynamic Island Navbar** - Apple-inspired navigation bar with theme toggle
 - **AI Chat Integration** - Ask questions about posts using Dify AI
 - **Theme System** - Dark (Dracula) and Light (Solarized) themes with persistent storage
-- **GitHub Sync** - Automatic post synchronization from a separate GitHub repository
 - **Responsive Design** - Mobile-first, beautifully styled with Tailwind CSS
 - **Post Management** - File-based JSON storage with metadata, tags, and view tracking
 - **Markdown Support** - AI responses render with proper markdown formatting
@@ -45,36 +44,35 @@
 │  │  GET  /search?q=     - Search posts                  │   │
 │  │  GET  /posts/tag/:tag - Filter by tag               │   │
 │  │  POST /api/chat      - AI chat endpoint              │   │
-│  │  GET  /api/pull-posts- Manual sync posts             │   │
 │  └──────────────────────────────────────────────────────┘   │
 └────┬──────────────────┬────────────────────┬─────────────────┘
      │                  │                    │
      │                  │                    │
 ┌────▼──────────────────▼────────────────────▼─────────────────┐
 │                    Services Layer                             │
-│  ┌──────────────────┐  ┌──────────────┐  ┌────────────────┐ │
-│  │ postService.js   │  │ gitService   │  │ difyService    │ │
-│  │                  │  │              │  │                │ │
-│  │ - getAllPosts()  │  │ - pullLatest- │  │ - sendMessage()│ │
-│  │ - getPostById()  │  │   Posts()    │  │ - AI API calls │ │
-│  │ - searchPosts()  │  │ - smartPull()│  │ - Markdown     │ │
-│  │ - getPostsByTag()│  │ - throttling │  │   responses    │ │
-│  │ - incrementViews │  │              │  │                │ │
-│  └──────────────────┘  └──────────────┘  └────────────────┘ │
-└────┬──────────────────┬────────────────────┬─────────────────┘
-     │                  │                    │
-     │                  │                    │
-┌────▼──────────────────▼────────────────────▼─────────────────┐
+│  ┌──────────────────────────────┐  ┌────────────────────┐   │
+│  │ postService.js               │  │ difyService.js     │   │
+│  │                              │  │                    │   │
+│  │ - getAllPosts()              │  │ - sendMessage()    │   │
+│  │ - getPostById()              │  │ - AI API calls     │   │
+│  │ - searchPosts()              │  │ - Markdown         │   │
+│  │ - getPostsByTag()            │  │   responses        │   │
+│  │ - incrementViews             │  │                    │   │
+│  └──────────────────────────────┘  └────────────────────┘   │
+└────┬──────────────────────────────────────┬─────────────────┘
+     │                                      │
+     │                                      │
+┌────▼──────────────────────────────────────▼─────────────────┐
 │                    Data Sources                              │
-│  ┌──────────────────┐  ┌──────────────┐  ┌────────────────┐ │
-│  │ ./storage/posts/ │  │ GitHub Posts │  │ Dify AI API    │ │
-│  │                  │  │ Repository   │  │                │ │
-│  │ - JSON files     │  │              │  │ - Chat API     │ │
-│  │ - Post metadata  │  │ - Master     │  │ - Markdown     │ │
-│  │ - View counts    │  │   branch     │  │   responses    │ │
-│  │                  │  │ - Auto-sync  │  │ - Conversation │ │
-│  │                  │  │   every 2min │  │   threading    │ │
-│  └──────────────────┘  └──────────────┘  └────────────────┘ │
+│  ┌──────────────────────────────┐  ┌────────────────────┐   │
+│  │ ./storage/posts/             │  │ Dify AI API        │   │
+│  │                              │  │                    │   │
+│  │ - JSON files                 │  │ - Chat API         │   │
+│  │ - Post metadata              │  │ - Markdown         │   │
+│  │ - View counts                │  │   responses        │   │
+│  │                              │  │ - Conversation     │   │
+│  │                              │  │   threading        │   │
+│  └──────────────────────────────┘  └────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -85,47 +83,15 @@
 │                    Blog Lifecycle                            │
 └─────────────────────────────────────────────────────────────┘
 
-1. WRITE POSTS (External, separate repo)
+1. WRITE POSTS (Local Storage)
    ┌─────────────────────────┐
-   │  GitHub: blog-posts     │
-   │  (andyeswong/blog-posts)│
-   │  └─ posts/              │
-   │    ├─ 001-nodejs.json   │
-   │    ├─ 002-mcp.json      │
-   │    └─ ...               │
+   │  ./storage/posts/       │
+   │  ├─ 001-post.json       │
+   │  ├─ 002-post.json       │
+   │  └─ ...                 │
    └────────────┬────────────┘
                 │
-                │ git push
-                │
-   ┌────────────▼────────────┐
-   │  GITHUB.COM             │
-   │  blog-posts repo        │
-   │  (public)               │
-   └────────────┬────────────┘
-                │
-                │ git clone/pull
-                │
-2. SYNC POSTS (Automatic)
-   ┌────────────▼────────────────────────────┐
-   │  gitService.smartPull()                 │
-   │  Triggers:                              │
-   │  - On app startup                       │
-   │  - Every visit to /                     │
-   │  - Manual POST /api/pull-posts          │
-   │  Throttle: 2 min (configurable)         │
-   └────────────┬─────────────────────────────┘
-                │
-                │ git pull origin master
-                │
-   ┌────────────▼────────────────────────────┐
-   │  ./storage/ (git repo)                  │
-   │  └─ posts/                              │
-   │    ├─ 001-introduccion-nodejs.json      │
-   │    ├─ 002-mcp-protocolo.json            │
-   │    └─ .gitkeep                          │
-   └────────────┬─────────────────────────────┘
-                │
-3. READ POSTS (On Demand)
+2. READ POSTS (On Demand)
    ├─────────────────────────────────────────┤
    │  postService.getAllPosts()              │
    │  - Reads ./storage/posts/*.json         │
@@ -141,7 +107,7 @@
    │  └─ /posts/tag/:tag (filtered)          │
    └──────────────────────────────────────────┘
                 │
-4. AI CHAT (On Post Detail Page)
+3. AI CHAT (On Post Detail Page)
    ├─────────────────────────────────────────┤
    │  User asks: "What is this post about?"  │
    └──────────────────┬──────────────────────┘
@@ -212,14 +178,13 @@
 ```
 blog/
 ├── .git/                          # Git repository
-├── .gitignore                     # Excludes posts, node_modules, etc
+├── .gitignore                     # Excludes node_modules, etc
 ├── README.md                      # This file
 ├── package.json                   # Dependencies: express, ejs
 ├── app.js                         # Express server & routes
 │
 ├── services/
 │   ├── postService.js             # Post CRUD operations
-│   ├── gitService.js              # GitHub sync & git operations
 │   └── difyService.js             # AI chat API calls
 │
 ├── views/                         # EJS templates
@@ -236,19 +201,11 @@ blog/
 │   ├── chat.js                    # AI chat UI controller
 │   └── glitch.js                  # Animations & effects
 │
-├── storage/
-│   └── posts/                     # (Ignored in git)
-│       ├── 001-introduccion-nodejs.json
-│       ├── 002-mcp-protocolo.json
-│       └── .gitkeep               # Keeps directory tracked
-│
-└── docs/
-    ├── GITHUB_INTEGRATION.md      # Posts sync documentation
-    ├── ENV_CONFIG.md              # Environment setup
-    ├── CHAT_TESTING.md            # Chat feature testing
-    ├── DESIGN_SYSTEM.md           # Design guidelines
-    ├── ROUTES.md                  # API routes
-    └── POSTS_STRUCTURE.md         # JSON post format
+└── storage/
+    └── posts/                     # JSON files for blog posts
+        ├── 001-post-slug.json
+        ├── 002-post-slug.json
+        └── .gitkeep               # Keeps directory tracked
 ```
 
 ---
@@ -257,7 +214,6 @@ blog/
 
 ### Prerequisites
 - Node.js 14+
-- Git
 - npm
 
 ### Installation
@@ -269,9 +225,6 @@ cd blog
 
 # Install dependencies
 npm install
-
-# Create .env file
-echo 'POSTS_REPO_URL=https://github.com/andyeswong/blog-posts.git' > .env
 
 # Start server
 npm start
@@ -286,29 +239,9 @@ Server runs on `http://localhost:3000`
 ### Environment Variables
 
 ```bash
-# .env
-POSTS_REPO_URL=https://github.com/andyeswong/blog-posts.git
+# .env (optional)
 PORT=3000
 ```
-
-### Git Workflow
-
-The project uses **two separate repositories**:
-
-1. **Blog Code** (this repo)
-   ```bash
-   git@github.com:andyeswong/blog.git
-   ```
-   - App code, UI, services
-   - Excluded: `./storage/posts/*`
-
-2. **Blog Posts** (separate repo)
-   ```bash
-   https://github.com/andyeswong/blog-posts.git
-   ```
-   - JSON post files
-   - Auto-synced every 2 minutes
-   - Branched: `master`
 
 ---
 
@@ -326,9 +259,6 @@ The project uses **two separate repositories**:
 
 ### AI
 - `POST /api/chat` - Chat with AI about post
-
-### GitHub Sync
-- `GET /api/pull-posts` - Manual sync posts
 
 ---
 
@@ -377,7 +307,7 @@ Toggle button in navbar. Persists in localStorage.
 
 ## 📝 Writing Posts
 
-Posts are JSON files in the separate repository:
+Posts are JSON files in the `storage/posts/` directory:
 
 ```json
 {
@@ -399,16 +329,14 @@ Posts are JSON files in the separate repository:
 }
 ```
 
-Push to `https://github.com/andyeswong/blog-posts.git` and posts auto-sync within 2 minutes.
+Add new posts directly to `storage/posts/` with the naming convention `{number}-{slug}.json`.
 
 ---
 
 ## 🔐 Security
 
 - HTML escaping in chat messages (XSS prevention)
-- API key stored in environment variable
 - No sensitive data in logs
-- Posts repository can be public
 - View counts updated locally (not production-grade)
 
 ---
@@ -416,7 +344,6 @@ Push to `https://github.com/andyeswong/blog-posts.git` and posts auto-sync withi
 ## 📊 Performance
 
 - **Posts cached**: On each API call
-- **Auto-sync throttled**: 2 minutes default
 - **Pagination**: 10 posts per page
 - **File-based**: Scales to ~1000s of posts
 - **CDN ready**: Static assets in `public/`
@@ -439,20 +366,14 @@ curl http://localhost:3000/api/posts
 # Test chat
 curl -X POST http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"query":"test","postId":"001-nodejs","conversationId":null}'
-
-# Manual pull
-curl http://localhost:3000/api/pull-posts
+  -d '{"query":"test","postId":"001-charm-crush","conversationId":null}'
 ```
 
 ---
 
 ## 📚 Documentation
 
-- [GitHub Integration](./GITHUB_INTEGRATION.md) - Post sync setup
-- [Environment Config](./ENV_CONFIG.md) - Variables & setup
 - [Chat Testing](./CHAT_TESTING.md) - AI features
-- [Design System](./DESIGN_SYSTEM.md) - UI guidelines
 - [Routes](./ROUTES.md) - API reference
 - [Post Structure](./POSTS_STRUCTURE.md) - JSON format
 
@@ -477,7 +398,7 @@ MIT - Use freely, credit appreciated
 
 **100% AI-Generated** with assistance from:
 - Claude (architecture, services, routing)
-- Crush (documentation, git setup)
+- Crush (documentation, setup)
 - Dify (AI conversation engine)
 
 This project demonstrates how modern AI can bootstrap a full-stack application from concept to production.

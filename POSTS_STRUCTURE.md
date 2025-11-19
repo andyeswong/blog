@@ -8,8 +8,9 @@ Los posts se almacenan como archivos JSON en la carpeta `storage/posts/`. Cada a
 blog/
 ├── storage/
 │   ├── posts/
-│   │   ├── 001-introduccion-nodejs.json
-│   │   ├── 002-arquitectura-microservicios.json
+│   │   ├── 001-charm-crush.json
+│   │   ├── 002-vibecoding-economico.json
+│   │   ├── 003-toon-compresion-contexto.json
 │   │   └── ...
 ```
 
@@ -19,7 +20,7 @@ blog/
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id` | string | Identificador único del post (ej: "001-titulo-slug") |
+| `id` | string | Identificador único del post (ej: "001-charm-crush") |
 | `title` | string | Título del artículo |
 | `slug` | string | URL-friendly versión del título (sin espacios, lowercase) |
 | `description` | string | Descripción breve del artículo (50-160 caracteres) |
@@ -69,9 +70,9 @@ Los archivos de posts deben nombrase siguiendo este patrón:
 ```
 
 **Ejemplos:**
-- `001-introduccion-nodejs.json`
-- `002-arquitectura-microservicios.json`
-- `003-testing-unitario-javascript.json`
+- `001-charm-crush.json`
+- `002-vibecoding-economico.json`
+- `003-toon-compresion-contexto.json`
 
 **Reglas:**
 - Número secuencial de 3 dígitos (001, 002, 003...)
@@ -126,24 +127,24 @@ console.log('Hello');</code></pre>
 
 ```json
 {
-  "id": "001-introduccion-nodejs",
-  "title": "Introducción a Node.js y Express: Construyendo APIs REST",
-  "slug": "introduccion-nodejs",
-  "description": "Aprende los fundamentos de Node.js y Express para construir aplicaciones backend escalables.",
+  "id": "001-charm-crush",
+  "title": "Charm Crush: Un Vistazo Técnico al Copiloto de IA",
+  "slug": "charm-crush",
+  "description": "Un análisis profundo de Charm Crush, explorando su integración con LSPs.",
   "image_url": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800",
-  "tags": ["node.js", "express", "backend", "api", "javascript"],
+  "tags": ["charm crush", "ai", "terminal", "llm"],
   "author": "AWONG",
-  "reading_time": 8,
+  "reading_time": 10,
   "content": "<article class=\"prose prose-invert\">...</article>",
   "metadata": {
     "created_time": "2024-11-06T10:30:00Z",
     "modification_time": "2024-11-06T14:45:00Z",
     "version": "1.0",
     "status": "published",
-    "seo_keywords": "node.js, express, backend, api rest"
+    "seo_keywords": "charm crush, ai terminal, lsp, developer tools"
   },
   "featured": true,
-  "views": 234
+  "views": 60
 }
 ```
 
@@ -179,8 +180,10 @@ async function getAllPosts() {
   const posts = [];
   
   for (const file of files) {
-    const data = await fs.readFile(path.join(dirPath, file), 'utf-8');
-    posts.push(JSON.parse(data));
+    if (file.endsWith('.json')) {
+      const data = await fs.readFile(path.join(dirPath, file), 'utf-8');
+      posts.push(JSON.parse(data));
+    }
   }
   
   return posts.sort((a, b) => 
@@ -198,6 +201,15 @@ async function getAllPosts() {
 5. **Imágenes**: Usar URLs externas o servir desde carpeta `public/images`
 6. **Backups**: Hacer backup regular de la carpeta `storage/`
 7. **Validación**: Validar JSON con herramientas antes de guardar
+
+## Agregar Nuevos Posts
+
+Para agregar un nuevo post:
+
+1. Crear archivo JSON en `storage/posts/` con el formato `{num}-{slug}.json`
+2. Incluir todos los campos obligatorios
+3. Asegurar que `metadata.created_time` esté en formato ISO 8601 UTC
+4. El post aparecerá automáticamente en la próxima carga de `/posts`
 
 ## Escalabilidad Futura
 
