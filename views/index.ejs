@@ -27,41 +27,67 @@
         </div>
       </nav>
 
-      <!-- Main headline -->
-      <div class="text-center max-w-5xl mx-auto px-8">
-        <h1 class="text-3xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight mb-8" style="color: var(--fg)">
-          <div class="mb-4 md:mb-6">
-            <span class="word" data-delay="1600">Código,</span>
-            <span class="word" data-delay="1750">IA</span>
-            <span class="word" data-delay="1900">y</span>
-            <span class="word" data-delay="2050">Arquitectura.</span>
-          </div>
-          <div class="text-2xl md:text-3xl lg:text-4xl font-light leading-relaxed" style="color: var(--purple)">
-            <span class="word" data-delay="2400">LLMs,</span>
-            <span class="word" data-delay="2550">sistemas</span>
-            <span class="word" data-delay="2700">escalables,</span>
-            <span class="word" data-delay="2850">y</span>
-            <span class="word" data-delay="3000">patrones</span>
-            <span class="word" data-delay="3150">—</span>
-            <span class="word" data-delay="3300">desde</span>
-            <span class="word" data-delay="3450">la</span>
-            <span class="word" data-delay="3600">teoría</span>
-            <span class="word" data-delay="3750">a</span>
-            <span class="word" data-delay="3900">producción.</span>
-          </div>
-        </h1>
+          <div class="max-w-3xl mx-auto">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <h2 class="text-2xl md:text-3xl font-light tracking-tight mb-4" style="color: var(--fg)">
+          ¿Qué te interesa aprender hoy?
+        </h2>
+        <p class="text-sm font-light opacity-70" style="color: var(--comment)">
+          Describe lo que buscas y te recomendaré artículos relevantes
+        </p>
       </div>
 
-      <!-- Bottom tagline -->
-      <div class="text-center mt-16">
-        <h2 class="text-xs md:text-sm font-mono font-light uppercase tracking-[0.2em] opacity-70" style="color: var(--purple)">
-          <span class="word" data-delay="4200">Explorando</span>
-          <span class="word" data-delay="4350">el</span>
-          <span class="word" data-delay="4500">futuro</span>
-          <span class="word" data-delay="4650">del</span>
-          <span class="word" data-delay="4800">desarrollo.</span>
-        </h2>
+      <!-- Recommendation Form -->
+      <div class="recommendation-container">
+        <form id="recommend-form" class="mb-8">
+          <div class="relative">
+            <textarea
+              id="recommend-input"
+              placeholder="Ej: Quiero aprender sobre inteligencia artificial y cómo integrarla en mis proyectos..."
+              class="w-full px-6 py-4 rounded-lg font-mono font-light text-sm resize-none transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); min-height: 120px;"
+              rows="4"
+            ></textarea>
+            <button
+              type="submit"
+              id="recommend-btn"
+              class="absolute bottom-4 right-4 px-4 py-2 rounded-lg font-mono font-light text-sm transition-all duration-300 hover:opacity-80"
+              style="background-color: var(--purple); color: var(--bg)"
+            >
+              <span id="recommend-btn-text">Recomendar</span>
+              <span id="recommend-btn-loading" class="hidden">...</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Results Container -->
+        <div id="recommend-results" class="hidden">
+          <div class="p-6 rounded-lg" style="background-color: var(--current-line); border: 1px solid var(--border-color)">
+            <div class="flex items-start gap-3 mb-4">
+              <span class="text-lg">🤖</span>
+              <h3 class="font-mono font-light text-sm" style="color: var(--purple)">Recomendaciones</h3>
+            </div>
+            <div id="recommend-content" class="font-mono font-light text-sm leading-relaxed markdown-content" style="color: var(--fg)">
+              <!-- AI response will be inserted here -->
+            </div>
+          </div>
+          <p class="text-center mt-4 text-xs font-light opacity-50" style="color: var(--comment)">
+            AI puede cometer errores. Verifica las respuestas importantes.
+          </p>
+        </div>
+
+        <!-- Error Container -->
+        <div id="recommend-error" class="hidden">
+          <div class="p-4 rounded-lg text-center" style="background-color: rgba(255, 85, 85, 0.1); border: 1px solid var(--red)">
+            <p class="font-mono font-light text-sm" style="color: var(--red)" id="recommend-error-text">
+              Error al obtener recomendaciones
+            </p>
+          </div>
+        </div>
       </div>
+    </div>
+
     </div>
 
     <!-- Scroll indicator -->
@@ -74,5 +100,6 @@
 
   <script src="/theme.js"></script>
   <script src="/glitch.js"></script>
+  <script src="/recommend.js"></script>
 </body>
 </html>

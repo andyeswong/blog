@@ -192,6 +192,37 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// API: Get AI recommendations for posts
+app.post('/api/recommend', async (req, res) => {
+  try {
+    const { query, conversationId } = req.body;
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing query'
+      });
+    }
+
+    // Get all posts for context
+    const posts = await postService.getAllPosts();
+    
+    const result = await difyService.sendRecommendation({
+      query,
+      posts,
+      conversationId: conversationId || null
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error in recommendation:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Página 404
 app.use((req, res) => {
   res.status(404).render('error', { message: 'Página no encontrada' });
