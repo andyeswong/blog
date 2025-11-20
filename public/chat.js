@@ -57,7 +57,8 @@ class PostAIChat {
               autocomplete="off"
             />
             <button type="submit" class="chat-send-btn" id="chat-send-btn">
-              <span class="send-icon">↑</span>
+              <span class="send-icon" id="chat-btn-icon">↑</span>
+              <span class="send-loading hidden" id="chat-btn-loading">...</span>
             </button>
           </form>
           <div class="chat-footer-text">AI puede cometer errores. Verifica las respuestas importantes.</div>
@@ -77,6 +78,61 @@ class PostAIChat {
   }
 
   /**
+   * Toggle button loading state
+   */
+  setButtonLoading(loading) {
+    const btn = document.getElementById('chat-send-btn');
+    const icon = document.getElementById('chat-btn-icon');
+    const loadingSpan = document.getElementById('chat-btn-loading');
+
+    if (btn && icon && loadingSpan) {
+      btn.disabled = loading;
+      icon.classList.toggle('hidden', loading);
+      loadingSpan.classList.toggle('hidden', !loading);
+    }
+  }
+
+  /**
+   * Show typing indicator in chat
+   */
+  showTypingIndicator() {
+    const messagesContainer = document.getElementById('chat-messages');
+    if (!messagesContainer) return;
+
+    // Remove welcome message if present
+    if (messagesContainer.querySelector('.welcome-message')) {
+      messagesContainer.innerHTML = '';
+    }
+
+    const typingEl = document.createElement('div');
+    typingEl.className = 'chat-message chat-message-ai typing-indicator';
+    typingEl.id = 'typing-indicator';
+    typingEl.innerHTML = `
+      <div class="message-avatar">🤖</div>
+      <div class="message-content">
+        <span class="typing-dots">
+          <span class="dot">.</span>
+          <span class="dot">.</span>
+          <span class="dot">.</span>
+        </span>
+      </div>
+    `;
+
+    messagesContainer.appendChild(typingEl);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  /**
+   * Remove typing indicator
+   */
+  removeTypingIndicator() {
+    const typingEl = document.getElementById('typing-indicator');
+    if (typingEl) {
+      typingEl.remove();
+    }
+  }
+
+  /**
    * Handle form submission
    */
   async handleSubmit(e) {
@@ -92,8 +148,8 @@ class PostAIChat {
 
     // Send to API
     this.isLoading = true;
-    const btn = document.getElementById('chat-send-btn');
-    btn.disabled = true;
+    this.setButtonLoading(true);
+    this.showTypingIndicator();
 
     try {
       const response = await fetch('/api/chat', {
@@ -124,7 +180,8 @@ class PostAIChat {
       this.addMessage('Error de conexión. Intenta de nuevo.', 'error');
     } finally {
       this.isLoading = false;
-      btn.disabled = false;
+      this.setButtonLoading(false);
+      this.removeTypingIndicator();
       input.focus();
     }
   }
