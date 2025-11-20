@@ -3,7 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Artículos - AWONG_blog</title>
+  
+  <!-- SEO Meta Tags -->
+  <title><%= selectedTag ? '#' + selectedTag + ' | ' : '' %><%= searchQuery ? 'Búsqueda: ' + searchQuery + ' | ' : '' %>Artículos | AWONG_blog</title>
+  <meta name="description" content="<%= selectedTag ? 'Artículos sobre ' + selectedTag + ' en AWONG_blog.' : searchQuery ? 'Resultados de búsqueda para: ' + searchQuery : 'Artículos sobre tecnología, inteligencia artificial, desarrollo de software y vibecoding. Guías prácticas y tutoriales técnicos.' %>">
+  <meta name="keywords" content="artículos tecnología, blog desarrollo, tutoriales programación, <%= selectedTag || 'AI, vibecoding, coding' %>">
+  <meta name="author" content="AWONG">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://blog.andres-wong.com/posts<%= selectedTag ? '/tag/' + selectedTag : '' %><%= currentPage > 1 ? '?page=' + currentPage : '' %>">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blog.andres-wong.com/posts">
+  <meta property="og:title" content="Artículos | AWONG_blog">
+  <meta property="og:description" content="Artículos sobre tecnología, inteligencia artificial, desarrollo de software y vibecoding.">
+  <meta property="og:image" content="https://blog.andres-wong.com/og-image.jpg">
+  <meta property="og:site_name" content="AWONG_blog">
+  <meta property="og:locale" content="es_ES">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://blog.andres-wong.com/posts">
+  <meta name="twitter:title" content="Artículos | AWONG_blog">
+  <meta name="twitter:description" content="Artículos sobre tecnología, inteligencia artificial, desarrollo de software y vibecoding.">
+  <meta name="twitter:image" content="https://blog.andres-wong.com/og-image.jpg">
+  
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "<%= selectedTag ? 'Artículos sobre ' + selectedTag : 'Artículos' %>",
+    "description": "Colección de artículos sobre tecnología, IA y desarrollo",
+    "url": "https://blog.andres-wong.com/posts",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "AWONG_blog",
+      "url": "https://blog.andres-wong.com/"
+    },
+    "inLanguage": "es"
+  }
+  </script>
+  
+  <!-- Breadcrumb JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://blog.andres-wong.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Artículos",
+        "item": "https://blog.andres-wong.com/posts"
+      }<% if (selectedTag) { %>,
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "<%= selectedTag %>",
+        "item": "https://blog.andres-wong.com/posts/tag/<%= selectedTag %>"
+      }<% } %>
+    ]
+  }
+  </script>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/styles.css">
 </head>

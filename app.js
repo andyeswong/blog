@@ -156,6 +156,83 @@ app.get('/about', (req, res) => {
   res.render('about');
 });
 
+// Sitemap XML dinámico
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const posts = await postService.getAllPosts();
+    const baseUrl = 'https://blog.andres-wong.com';
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Página principal -->
+  <url>
+    <loc>${baseUrl}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Página de artículos -->
+  <url>
+    <loc>${baseUrl}/posts</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Página Acerca de -->
+  <url>
+    <loc>${baseUrl}/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Artículos individuales -->
+`;
+    
+    posts.forEach(post => {
+      const lastMod = post.metadata.modification_time || post.metadata.created_time;
+      xml += `  <url>
+    <loc>${baseUrl}/posts/${post.id}</loc>
+    <lastmod>${new Date(lastMod).toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>`;
+      
+      if (post.image_url) {
+        xml += `
+    <image:image>
+      <image:loc>${post.image_url}</image:loc>
+      <image:title>${post.title.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')}</image:title>
+    </image:image>`;
+      }
+      
+      xml += `
+  </url>
+`;
+    });
+    
+    // Agregar páginas de tags
+    const tags = await postService.getAllTags();
+    tags.forEach(tag => {
+      xml += `  <url>
+    <loc>${baseUrl}/posts/tag/${encodeURIComponent(tag)}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+`;
+    });
+    
+    xml += `</urlset>`;
+    
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // API: Chat with AI about post
 app.post('/api/chat', async (req, res) => {
   try {

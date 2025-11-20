@@ -1,0 +1,19 @@
+# robots.txt for AWONG_blog
+# https://blog.andres-wong.com
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://blog.andres-wong.com/sitemap.xml
+
+# Disallow API endpoints
+Disallow: /api/
+
+# Allow search engines to crawl all content
+Allow: /posts/
+Allow: /about
+Allow: /search
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
