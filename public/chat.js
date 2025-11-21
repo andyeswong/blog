@@ -40,7 +40,7 @@ class PostAIChat {
         </div>
 
         <!-- Messages Container -->
-        <div class="chat-messages" id="chat-messages">
+        <div class="chat-messages backdrop-blur-sm" id="chat-messages">
           <div class="welcome-message">
             <p>Hola 👋 Tengo preguntas sobre este artículo? Preguntame cualquier cosa y usaré el contenido del post para responder.</p>
           </div>

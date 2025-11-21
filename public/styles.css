@@ -593,3 +593,11 @@ nav a:hover {
 .markdown-content li {
   margin-bottom: 0.25em;
 }
+
+.articles {
+  background-image: url('/noise.svg');
+}
+
+body {
+    background-image: url('/noise.svg');
+}
