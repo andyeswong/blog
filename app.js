@@ -5,6 +5,7 @@ try {
 }
 const express = require('express');
 const path = require('path');
+const QRCode = require('qrcode');
 const postService = require('./services/postService');
 const difyService = require('./services/difyService');
 const app = express();
@@ -296,6 +297,46 @@ app.post('/api/recommend', async (req, res) => {
     res.status(500).json({
       success: false,
       error: error.message
+    });
+  }
+});
+
+// API: Generate QR Code for post
+app.get('/api/qr/:postId', async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const post = await postService.getPostById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        success: false,
+        error: 'Post not found'
+      });
+    }
+
+    const postUrl = `https://blog.andres-wong.com/posts/${postId}`;
+
+    // Generate QR code as data URL (base64 PNG)
+    const qrDataUrl = await QRCode.toDataURL(postUrl, {
+      width: 300,
+      margin: 2,
+      color: {
+        dark: '#282a36',
+        light: '#f8f8f2'
+      }
+    });
+
+    res.json({
+      success: true,
+      qrCode: qrDataUrl,
+      url: postUrl,
+      postTitle: post.title
+    });
+  } catch (error) {
+    console.error('Error generating QR code:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error generating QR code'
     });
   }
 });
