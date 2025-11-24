@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,43 +12,48 @@
       transition: opacity 0.3s ease-in-out;
       opacity: 1;
     }
+
     nav.hidden-nav {
       opacity: 0;
       pointer-events: none;
     }
   </style>
 </head>
+
 <body class="font-mono overflow-x-hidden" style="background-color: var(--body-bg); color: var(--fg);">
   <!-- Dynamic Island Navbar -->
-      <nav class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 mb-20">
-        <div class="flex items-center justify-center gap-4 px-6 py-3 rounded-lg w-100 transition-all duration-500">
+  <nav class="fixed top-6 backdrop-blur-md rounded-md left-1/2 transform -translate-x-1/2 z-50 mb-20">
+    <div class="flex items-center justify-center gap-4 px-6 py-3 rounded-lg w-100 transition-all duration-500">
       <span class="text-sm font-light tracking-[0.1em]">AWONG_blog</span>
       <div class="w-px h-6" style="background-color: var(--border-color)"></div>
       <div class="flex gap-1">
-        <a href="/" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">inicio</a>
-        <a href="/posts" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">artículos</a>
-        <a href="/about" class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-lg border" >acerca</a>
+        <a href="/"
+          class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50"
+          style="color: var(--purple)">inicio</a>
+        <a href="/posts"
+          class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50"
+          style="color: var(--purple)">artículos</a>
+        <a href="/about"
+          class="px-6 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-lg border">acerca</a>
       </div>
       <div class="w-px h-6" style="background-color: var(--border-color)"></div>
       <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"></button>
-    </div>
-  </nav>
     </div>
   </nav>
 
   <script>
     let lastScrollY = 0;
     const navbar = document.getElementById('navbar');
-    
+
     window.addEventListener('scroll', () => {
       const currentScrollY = window.scrollY;
-      
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         navbar.classList.add('hidden-nav');
       } else {
         navbar.classList.remove('hidden-nav');
       }
-      
+
       lastScrollY = currentScrollY;
     });
   </script>
@@ -64,40 +70,59 @@
           <p class="text-xl font-light mb-4" style="color: var(--purple)">
             Desarrollador de software con <span style="color: var(--green)">10+ años de experiencia</span>
           </p>
-          <div class="w-16 h-px mx-auto mt-6" style="background: linear-gradient(to right, transparent, var(--cyan), transparent)"></div>
+          <div class="w-16 h-px mx-auto mt-6"
+            style="background: linear-gradient(to right, transparent, var(--cyan), transparent)"></div>
         </section>
 
         <!-- Main Description -->
         <section class="mb-16 p-8 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg">
-          <h2 class="text-2xl font-light mb-6 tracking-tight" style="color: var(--fg)">🚀 Construyendo Soluciones Funcionales</h2>
+          <h2 class="text-2xl font-light mb-6 tracking-tight" style="color: var(--fg)">🚀 Construyendo Soluciones
+            Funcionales</h2>
           <p class="font-light leading-relaxed mb-6" style="color: var(--purple)">
-            Especializado en desarrollar soluciones robustas y escalables para aplicaciones web dinámicas, sistemas backend y scripts de automatización. Mi enfoque se centra en la calidad, rendimiento y mantenibilidad del código.
+            Especializado en desarrollar soluciones robustas y escalables para aplicaciones web dinámicas, sistemas
+            backend y scripts de automatización. Mi enfoque se centra en la calidad, rendimiento y mantenibilidad del
+            código.
           </p>
-          
-          <div class="border-l-2 border-purple-500/50 pl-6 py-4 bg-purple-500/5 rounded-r" style="border-left-color: var(--cyan);">
+
+          <div class="border-l-2 border-purple-500/50 pl-6 py-4 bg-purple-500/5 rounded-r"
+            style="border-left-color: var(--cyan);">
             <p class="font-light" style="color: var(--cyan)">
               <span style="color: var(--green)">🆕 NUEVO:</span> AI Training & Workshops para Empresas
             </p>
             <p class="font-light text-sm mt-2" style="color: var(--comment)">
-              <em>Del Hype a la Herramienta Práctica</em> - Transformando IA de concepto de moda a herramienta empresarial práctica.
+              <em>Del Hype a la Herramienta Práctica</em> - Transformando IA de concepto de moda a herramienta
+              empresarial práctica.
             </p>
           </div>
         </section>
 
         <!-- Tech Stack -->
         <section class="mb-16">
-          <h2 class="text-2xl font-light mb-8 tracking-tight" style="color: var(--fg)">🛠️ Stack Tecnológico & Expertise</h2>
-          
+          <h2 class="text-2xl font-light mb-8 tracking-tight" style="color: var(--fg)">🛠️ Stack Tecnológico & Expertise
+          </h2>
+
           <!-- Programming Languages -->
           <div class="mb-8">
             <h3 class="text-lg font-light mb-4" style="color: var(--green)">Lenguajes de Programación</h3>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">JavaScript</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Python</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">C#</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">PHP</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Bash</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">SQL</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">JavaScript</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Python</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">C#</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">PHP</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Bash</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">SQL</div>
             </div>
           </div>
 
@@ -105,15 +130,33 @@
           <div class="mb-8">
             <h3 class="text-lg font-light mb-4" style="color: var(--green)">Frameworks & Librerías</h3>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Laravel</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">.NET</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Vue.js</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">React</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Node.js</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Angular</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Astro</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Ionic</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Flutter</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Laravel</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">.NET</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Vue.js</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">React</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Node.js</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Angular</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Astro</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Ionic</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Flutter</div>
             </div>
           </div>
 
@@ -121,12 +164,24 @@
           <div>
             <h3 class="text-lg font-light mb-4" style="color: var(--green)">DevOps & Infraestructura</h3>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Docker</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Kubernetes</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Terraform</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">DigitalOcean</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">Vercel</div>
-              <div class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all" style="color: var(--cyan)">VMware</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Docker</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Kubernetes</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Terraform</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">DigitalOcean</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">Vercel</div>
+              <div
+                class="px-4 py-3 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 transition-all"
+                style="color: var(--cyan)">VMware</div>
             </div>
           </div>
         </section>
@@ -134,10 +189,11 @@
         <!-- What I Do -->
         <section class="mb-16">
           <h2 class="text-2xl font-light mb-8 tracking-tight" style="color: var(--fg)">🎯 Qué Hago</h2>
-          
+
           <div class="space-y-6">
             <!-- Full-Stack Development -->
-            <div class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
+            <div
+              class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
               <h3 class="text-lg font-light mb-3" style="color: var(--green)">🔧 Desarrollo Full-Stack</h3>
               <ul class="space-y-2 font-light" style="color: var(--purple)">
                 <li>• <strong>Aplicaciones Web:</strong> Soluciones dinámicas y responsivas con frameworks modernos</li>
@@ -147,7 +203,8 @@
             </div>
 
             <!-- AI Integration -->
-            <div class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
+            <div
+              class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
               <h3 class="text-lg font-light mb-3" style="color: var(--green)">🤖 Integración IA & Capacitación</h3>
               <ul class="space-y-2 font-light" style="color: var(--purple)">
                 <li>• Implementación práctica de IA para empresas</li>
@@ -157,9 +214,11 @@
             </div>
 
             <!-- System Architecture -->
-            <div class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
+            <div
+              class="p-6 border border-purple-500/20 bg-[#282a36]/40 backdrop-blur-md rounded-lg hover:border-purple-500/40 transition-all">
               <h3 class="text-lg font-light mb-3" style="color: var(--green)">🏗️ Arquitectura de Sistemas</h3>
-              <p class="font-light mb-3" style="color: var(--comment)"><em>"Diseñando el Mañana: Donde la Innovación se Encuentra con la Precisión"</em></p>
+              <p class="font-light mb-3" style="color: var(--comment)"><em>"Diseñando el Mañana: Donde la Innovación se
+                  Encuentra con la Precisión"</em></p>
               <ul class="space-y-2 font-light" style="color: var(--purple)">
                 <li>• Diseño de sistemas escalables y mantenibles</li>
                 <li>• Infraestructura cloud y soluciones DevOps</li>
@@ -170,26 +229,21 @@
         </section>
 
         <!-- Contact CTA -->
-        <section class="text-center py-12 px-8 border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg">
+        <section
+          class="text-center py-12 px-8 border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg">
           <h2 class="text-2xl font-light mb-4" style="color: var(--fg)">Conectemos</h2>
           <p class="font-light mb-6" style="color: var(--purple)">
             ¿Tienes un proyecto en mente? ¿Necesitas consultoría o capacitación? Estoy disponible para colaborar.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="https://www.andres-wong.com" 
-              target="_blank"
+            <a href="https://www.andres-wong.com" target="_blank"
               class="px-6 py-3 font-light rounded-lg border border-purple-500/50 hover:border-purple-500/80 transition-all"
-              style="color: var(--cyan)"
-            >
+              style="color: var(--cyan)">
               Visita mi sitio web
             </a>
-            <a 
-              href="https://www.andres-wong.com/contact" 
-              target="_blank"
+            <a href="https://www.andres-wong.com/contact" target="_blank"
               class="px-6 py-3 font-light rounded-lg transition-all"
-              style="background-color: rgba(80, 250, 123, 0.2); border: 1px solid var(--green); color: var(--green);"
-            >
+              style="background-color: rgba(80, 250, 123, 0.2); border: 1px solid var(--green); color: var(--green);">
               Contáctame
             </a>
           </div>
@@ -210,7 +264,8 @@
 
   <%- include('footer') %>
 
-  <script src="/theme.js"></script>
-  <script src="/glitch.js"></script>
+    <script src="/theme.js"></script>
+    <script src="/glitch.js"></script>
 </body>
+
 </html>
