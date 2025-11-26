@@ -157,16 +157,39 @@
     <% if (tags.length> 0) { %>
       <div class="mb-12">
         <p class="mb-4 font-light tracking-tight" style="color: var(--purple)">filtrar por:</p>
-        <div class="flex flex-wrap gap-2">
-          <% tags.forEach(tag=> { %>
+        <div class="flex flex-wrap gap-2" id="tags-container">
+          <% tags.forEach((tag, index)=> { %>
             <a href="/posts/tag/<%= tag %>"
-              class="px-4 py-2 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 hover:bg-[#282a36]/60 transition-all duration-300 font-light text-sm"
-              style="color: <%= selectedTag === tag ? 'var(--green)' : 'var(--cyan)' %>; border-color: <%= selectedTag === tag ? 'rgba(80, 250, 123, 0.5)' : 'rgba(139, 233, 253, 0.2)' %>">
+              class="<%= index >= 10 ? 'hidden-tag' : '' %> px-4 py-2 bg-[#282a36]/40 border border-purple-500/20 rounded-lg hover:border-purple-500/50 hover:bg-[#282a36]/60 transition-all duration-300 font-light text-sm"
+              style="color: <%= selectedTag === tag ? 'var(--green)' : 'var(--cyan)' %>; border-color: <%= selectedTag === tag ? 'rgba(80, 250, 123, 0.5)' : 'rgba(139, 233, 253, 0.2)' %>; <%= index >= 10 ? 'display: none;' : '' %>">
               #<%= tag %>
             </a>
             <% }); %>
         </div>
+        <% if (tags.length> 10) { %>
+          <button id="toggle-tags-btn"
+            class="mt-4 px-4 py-2 bg-transparent border border-purple-500/20 rounded-lg hover:border-purple-500/50 hover:bg-[#282a36]/40 transition-all duration-300 font-light text-sm"
+            style="color: var(--comment);"
+            onclick="toggleTags()">
+            show all (<%= tags.length %>)
+          </button>
+          <% } %>
       </div>
+
+      <script>
+        function toggleTags() {
+          const hiddenTags = document.querySelectorAll('.hidden-tag');
+          const button = document.getElementById('toggle-tags-btn');
+          const isExpanded = button.getAttribute('data-expanded') === 'true';
+
+          hiddenTags.forEach(tag => {
+            tag.style.display = isExpanded ? 'none' : 'inline-block';
+          });
+
+          button.setAttribute('data-expanded', !isExpanded);
+          button.textContent = isExpanded ? 'show all (<%= tags.length %>)' : 'show less';
+        }
+      </script>
       <% } %>
 
         <!-- Posts Grid -->
