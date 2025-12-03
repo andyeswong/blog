@@ -1,7 +1,4 @@
-const fs = require('fs').promises;
-const path = require('path');
-
-const POSTS_DIR = path.join(__dirname, '..', 'storage', 'posts');
+const supabase = require('./supabaseClient');
 
 /**
  * Obtiene todos los posts ordenados por fecha de creación descendente
@@ -9,30 +6,17 @@ const POSTS_DIR = path.join(__dirname, '..', 'storage', 'posts');
  */
 async function getAllPosts() {
   try {
-    const files = await fs.readdir(POSTS_DIR);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
-    
-    const posts = [];
-    
-    for (const file of jsonFiles) {
-      try {
-        const filePath = path.join(POSTS_DIR, file);
-        const data = await fs.readFile(filePath, 'utf-8');
-        const post = JSON.parse(data);
-        posts.push(post);
-      } catch (error) {
-        console.error(`Error reading post ${file}:`, error.message);
-      }
-    }
-    
-    // Ordenar por fecha de creación descendente (más nuevos primero)
-    posts.sort((a, b) => 
-      new Date(b.metadata.created_time) - new Date(a.metadata.created_time)
-    );
-    
-    return posts;
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_time', { ascending: false });
+
+    if (error) throw error;
+
+    // Transformar datos de Supabase al formato esperado por la app
+    return data.map(transformPostFromSupabase);
   } catch (error) {
-    console.error('Error reading posts directory:', error.message);
+    console.error('Error reading posts from Supabase:', error.message);
     return [];
   }
 }
@@ -44,10 +28,15 @@ async function getAllPosts() {
  */
 async function getPostById(postId) {
   try {
-    const filePath = path.join(POSTS_DIR, `${postId}.json`);
-    const data = await fs.readFile(filePath, 'utf-8');
-    const post = JSON.parse(data);
-    return post;
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('id', postId)
+      .single();
+
+    if (error) throw error;
+
+    return transformPostFromSupabase(data);
   } catch (error) {
     console.error(`Error reading post ${postId}:`, error.message);
     return null;
@@ -61,10 +50,15 @@ async function getPostById(postId) {
  */
 async function getPostsByTag(tag) {
   try {
-    const allPosts = await getAllPosts();
-    return allPosts.filter(post => 
-      post.tags.map(t => t.toLowerCase()).includes(tag.toLowerCase())
-    );
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .contains('tags', [tag])
+      .order('created_time', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(transformPostFromSupabase);
   } catch (error) {
     console.error('Error filtering posts by tag:', error.message);
     return [];
@@ -77,8 +71,16 @@ async function getPostsByTag(tag) {
  */
 async function getFeaturedPosts() {
   try {
-    const allPosts = await getAllPosts();
-    return allPosts.filter(post => post.featured === true).slice(0, 3);
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('featured', true)
+      .order('created_time', { ascending: false })
+      .limit(3);
+
+    if (error) throw error;
+
+    return data.map(transformPostFromSupabase);
   } catch (error) {
     console.error('Error getting featured posts:', error.message);
     return [];
@@ -92,10 +94,14 @@ async function getFeaturedPosts() {
  */
 async function searchPosts(query) {
   try {
-    const allPosts = await getAllPosts();
     const lowerQuery = query.toLowerCase();
-    
-    return allPosts.filter(post => 
+
+    // Supabase no tiene full-text search directo en el cliente,
+    // así que obtenemos todos y filtramos en memoria
+    // En producción, considera usar pg_trgm o implementar búsqueda en el servidor
+    const allPosts = await getAllPosts();
+
+    return allPosts.filter(post =>
       post.title.toLowerCase().includes(lowerQuery) ||
       post.description.toLowerCase().includes(lowerQuery) ||
       post.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
@@ -112,13 +118,17 @@ async function searchPosts(query) {
  */
 async function getAllTags() {
   try {
-    const allPosts = await getAllPosts();
+    const { data, error } = await supabase
+      .from('posts')
+      .select('tags');
+
+    if (error) throw error;
+
     const tagsSet = new Set();
-    
-    allPosts.forEach(post => {
+    data.forEach(post => {
       post.tags.forEach(tag => tagsSet.add(tag));
     });
-    
+
     return Array.from(tagsSet).sort();
   } catch (error) {
     console.error('Error getting all tags:', error.message);
@@ -133,14 +143,24 @@ async function getAllTags() {
  */
 async function incrementPostViews(postId) {
   try {
-    const post = await getPostById(postId);
-    if (!post) return;
-    
-    post.views = (post.views || 0) + 1;
-    post.metadata.modification_time = new Date().toISOString();
-    
-    const filePath = path.join(POSTS_DIR, `${postId}.json`);
-    await fs.writeFile(filePath, JSON.stringify(post, null, 2));
+    // Primero obtener el post actual
+    const { data: currentPost, error: fetchError } = await supabase
+      .from('posts')
+      .select('views')
+      .eq('id', postId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Incrementar vistas
+    const { error: updateError } = await supabase
+      .from('posts')
+      .update({
+        views: (currentPost.views || 0) + 1
+      })
+      .eq('id', postId);
+
+    if (updateError) throw updateError;
   } catch (error) {
     console.error(`Error incrementing views for post ${postId}:`, error.message);
   }
@@ -154,18 +174,18 @@ async function getPostsStats() {
   try {
     const allPosts = await getAllPosts();
     const tags = await getAllTags();
-    
+
     const totalViews = allPosts.reduce((sum, post) => sum + (post.views || 0), 0);
     const totalPosts = allPosts.length;
-    
+
     return {
       total: totalPosts,
       totalViews: totalViews,
       totalTags: tags.length,
       averageViews: totalPosts > 0 ? Math.round(totalViews / totalPosts) : 0,
       newestPost: allPosts.length > 0 ? allPosts[0] : null,
-      mostViewedPost: allPosts.reduce((max, post) => 
-        (post.views || 0) > (max.views || 0) ? post : max, 
+      mostViewedPost: allPosts.reduce((max, post) =>
+        (post.views || 0) > (max.views || 0) ? post : max,
         allPosts[0] || null
       )
     };
@@ -194,33 +214,35 @@ async function createPost(postData) {
       throw new Error('Post ID already exists');
     }
 
-    // Crear objeto de post completo
-    const post = {
+    // Preparar datos para Supabase
+    const newPost = {
       id: postData.id,
       title: postData.title,
       slug: postData.slug,
       description: postData.description,
-      image_url: postData.image_url || '',
+      image_url: postData.image_url || null,
       tags: Array.isArray(postData.tags) ? postData.tags : postData.tags.split(',').map(t => t.trim()),
       author: postData.author || 'AWONG',
       reading_time: parseInt(postData.reading_time) || 5,
       content: postData.content,
-      metadata: {
-        created_time: new Date().toISOString(),
-        modification_time: new Date().toISOString(),
-        version: '1.0',
-        status: postData.status || 'published',
-        seo_keywords: postData.seo_keywords || ''
-      },
+      created_time: new Date().toISOString(),
+      modification_time: new Date().toISOString(),
+      version: '1.0',
+      status: postData.status || 'published',
+      seo_keywords: postData.seo_keywords || null,
       featured: postData.featured === true || postData.featured === 'true',
       views: 0
     };
 
-    // Guardar archivo
-    const filePath = path.join(POSTS_DIR, `${post.id}.json`);
-    await fs.writeFile(filePath, JSON.stringify(post, null, 2));
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([newPost])
+      .select()
+      .single();
 
-    return post;
+    if (error) throw error;
+
+    return transformPostFromSupabase(data);
   } catch (error) {
     console.error('Error creating post:', error.message);
     throw error;
@@ -240,9 +262,8 @@ async function updatePost(postId, postData) {
       throw new Error('Post not found');
     }
 
-    // Actualizar post manteniendo algunos campos del original
-    const updatedPost = {
-      ...existingPost,
+    // Preparar datos actualizados
+    const updatedData = {
       title: postData.title || existingPost.title,
       slug: postData.slug || existingPost.slug,
       description: postData.description || existingPost.description,
@@ -252,20 +273,22 @@ async function updatePost(postId, postData) {
       reading_time: postData.reading_time ? parseInt(postData.reading_time) : existingPost.reading_time,
       content: postData.content !== undefined ? postData.content : existingPost.content,
       featured: postData.featured !== undefined ? (postData.featured === true || postData.featured === 'true') : existingPost.featured,
-      metadata: {
-        ...existingPost.metadata,
-        modification_time: new Date().toISOString(),
-        version: incrementVersion(existingPost.metadata.version),
-        status: postData.status || existingPost.metadata.status,
-        seo_keywords: postData.seo_keywords !== undefined ? postData.seo_keywords : existingPost.metadata.seo_keywords
-      }
+      version: incrementVersion(existingPost.metadata.version),
+      status: postData.status || existingPost.metadata.status,
+      seo_keywords: postData.seo_keywords !== undefined ? postData.seo_keywords : existingPost.metadata.seo_keywords
+      // modification_time se actualiza automáticamente por el trigger en Supabase
     };
 
-    // Guardar archivo
-    const filePath = path.join(POSTS_DIR, `${postId}.json`);
-    await fs.writeFile(filePath, JSON.stringify(updatedPost, null, 2));
+    const { data, error } = await supabase
+      .from('posts')
+      .update(updatedData)
+      .eq('id', postId)
+      .select()
+      .single();
 
-    return updatedPost;
+    if (error) throw error;
+
+    return transformPostFromSupabase(data);
   } catch (error) {
     console.error(`Error updating post ${postId}:`, error.message);
     throw error;
@@ -279,8 +302,12 @@ async function updatePost(postId, postData) {
  */
 async function deletePost(postId) {
   try {
-    const filePath = path.join(POSTS_DIR, `${postId}.json`);
-    await fs.unlink(filePath);
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', postId);
+
+    if (error) throw error;
   } catch (error) {
     console.error(`Error deleting post ${postId}:`, error.message);
     throw error;
@@ -304,13 +331,17 @@ function incrementVersion(version) {
  */
 async function generateNextId(slug) {
   try {
-    const files = await fs.readdir(POSTS_DIR);
-    const jsonFiles = files.filter(file => file.endsWith('.json'));
+    // Obtener todos los posts
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id');
 
-    // Extraer números de los archivos existentes
-    const numbers = jsonFiles
-      .map(file => {
-        const match = file.match(/^(\d+)-/);
+    if (error) throw error;
+
+    // Extraer números de los IDs existentes
+    const numbers = data
+      .map(post => {
+        const match = post.id.match(/^(\d+)-/);
         return match ? parseInt(match[1]) : 0;
       })
       .filter(num => num > 0);
@@ -324,6 +355,34 @@ async function generateNextId(slug) {
     console.error('Error generating next ID:', error.message);
     throw error;
   }
+}
+
+/**
+ * Transforma un post de Supabase al formato esperado por la app
+ * @param {Object} post - Post de Supabase
+ * @returns {Object} Post en formato de la app
+ */
+function transformPostFromSupabase(post) {
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    description: post.description,
+    image_url: post.image_url,
+    tags: post.tags,
+    author: post.author,
+    reading_time: post.reading_time,
+    content: post.content,
+    metadata: {
+      created_time: post.created_time,
+      modification_time: post.modification_time,
+      version: post.version,
+      status: post.status,
+      seo_keywords: post.seo_keywords
+    },
+    featured: post.featured,
+    views: post.views
+  };
 }
 
 module.exports = {
