@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= isEdit ? 'Editar Post' : 'Crear Post' %> | AWONG_blog Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css">
+
+  <!-- TinyMCE -->
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body class="font-mono overflow-x-hidden" style="background-color: var(--body-bg); color: var(--fg);">
+
+  <!-- Navbar Admin -->
+  <nav class="fixed backdrop-blur-md rounded-md top-6 left-1/2 transform -translate-x-1/2 z-50">
+    <div class="flex items-center justify-center gap-4 px-6 py-3 rounded-lg w-100 transition-all duration-500">
+      <span class="text-sm font-light tracking-[0.1em]">AWONG_blog</span>
+      <div class="w-px h-6" style="background-color: var(--border-color)"></div>
+      <div class="flex gap-1">
+        <a href="/admin/dashboard" class="px-4 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--purple)">← dashboard</a>
+        <a href="/admin/logout" class="px-4 py-2 mx-1 font-light tracking-[0.1em] transition-all duration-300 rounded-full hover:bg-opacity-50" style="color: var(--red)">salir</a>
+      </div>
+      <div class="w-px h-6" style="background-color: var(--border-color)"></div>
+      <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"></button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <section class="py-24 px-4 sm:px-8 max-w-5xl mx-auto pt-28">
+
+    <!-- Header -->
+    <div class="mb-12">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4" style="color: var(--fg)">
+        <%= isEdit ? 'editar_post' : 'crear_post' %>
+      </h1>
+      <div class="w-16 h-px" style="background: linear-gradient(to right, var(--cyan), transparent)"></div>
+      <% if (typeof isImported !== 'undefined' && isImported) { %>
+        <div class="mt-4 p-3 rounded-lg inline-block" style="background-color: rgba(139, 233, 253, 0.1); border: 1px solid var(--cyan);">
+          <p class="text-sm font-light" style="color: var(--cyan)">
+            📥 Datos importados desde JSON - Revisa y ajusta antes de guardar
+          </p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Error Message -->
+    <% if (error) { %>
+      <div class="mb-6 p-4 rounded-lg" style="background-color: rgba(255, 85, 85, 0.1); border: 1px solid var(--red)">
+        <p class="font-mono font-light text-sm" style="color: var(--red)">
+          Error: <%= error %>
+        </p>
+      </div>
+    <% } %>
+
+    <!-- Form -->
+    <form action="<%= isEdit ? '/admin/posts/edit/' + post.id : '/admin/posts/new' %>" method="POST" class="space-y-6">
+
+      <!-- Basic Info Section -->
+      <div class="backdrop-blur-sm border rounded-lg p-6" style="background-color: rgba(40, 42, 54, 0.4); border-color: var(--border-color);">
+        <h2 class="text-xl font-light mb-6" style="color: var(--cyan)">Información Básica</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Title -->
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Título *
+            </label>
+            <input
+              type="text"
+              name="title"
+              required
+              value="<%= post ? post.title : '' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="Título del artículo"
+            />
+          </div>
+
+          <!-- Slug -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Slug * <span style="color: var(--comment); font-size: 0.75rem;">(URL-friendly, sin espacios)</span>
+            </label>
+            <input
+              type="text"
+              name="slug"
+              required
+              value="<%= post ? post.slug : '' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="ejemplo-slug-del-post"
+            />
+          </div>
+
+          <!-- Author -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Autor
+            </label>
+            <input
+              type="text"
+              name="author"
+              value="<%= post ? post.author : 'AWONG' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="AWONG"
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Descripción * <span style="color: var(--comment); font-size: 0.75rem;">(50-160 caracteres)</span>
+            </label>
+            <textarea
+              name="description"
+              required
+              rows="3"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm resize-none transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="Breve descripción del artículo para SEO y previews..."
+            ><%= post ? post.description : '' %></textarea>
+          </div>
+
+          <!-- Image URL -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              URL de Imagen
+            </label>
+            <input
+              type="text"
+              name="image_url"
+              value="<%= post ? post.image_url : '' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="https://ejemplo.com/imagen.jpg"
+            />
+          </div>
+
+          <!-- Reading Time -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Tiempo de Lectura (minutos)
+            </label>
+            <input
+              type="number"
+              name="reading_time"
+              min="1"
+              value="<%= post ? post.reading_time : 5 %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="5"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags & SEO Section -->
+      <div class="backdrop-blur-sm border rounded-lg p-6" style="background-color: rgba(40, 42, 54, 0.4); border-color: var(--border-color);">
+        <h2 class="text-xl font-light mb-6" style="color: var(--cyan)">Tags & SEO</h2>
+
+        <div class="grid grid-cols-1 gap-6">
+          <!-- Tags -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Tags * <span style="color: var(--comment); font-size: 0.75rem;">(separados por comas)</span>
+            </label>
+            <input
+              type="text"
+              name="tags"
+              required
+              value="<%= post ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="nodejs, javascript, backend, api"
+            />
+          </div>
+
+          <!-- SEO Keywords -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              SEO Keywords <span style="color: var(--comment); font-size: 0.75rem;">(separados por comas)</span>
+            </label>
+            <input
+              type="text"
+              name="seo_keywords"
+              value="<%= post && post.metadata ? post.metadata.seo_keywords : '' %>"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color); caret-color: var(--cyan);"
+              placeholder="javascript, node.js, tutorial, backend development"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Status & Options Section -->
+      <div class="backdrop-blur-sm border rounded-lg p-6" style="background-color: rgba(40, 42, 54, 0.4); border-color: var(--border-color);">
+        <h2 class="text-xl font-light mb-6" style="color: var(--cyan)">Estado & Opciones</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Status -->
+          <div>
+            <label class="block mb-2 text-sm font-light" style="color: var(--purple)">
+              Estado
+            </label>
+            <select
+              name="status"
+              class="w-full px-4 py-3 rounded-lg font-mono font-light text-sm transition-all duration-300 focus:outline-none"
+              style="background-color: var(--current-line); color: var(--fg); border: 1px solid var(--border-color);"
+            >
+              <option value="published" <%= post && post.metadata && post.metadata.status === 'published' ? 'selected' : '' %>>Published</option>
+              <option value="draft" <%= post && post.metadata && post.metadata.status === 'draft' ? 'selected' : '' %>>Draft</option>
+              <option value="archived" <%= post && post.metadata && post.metadata.status === 'archived' ? 'selected' : '' %>>Archived</option>
+            </select>
+          </div>
+
+          <!-- Featured -->
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              name="featured"
+              id="featured"
+              value="true"
+              <%= post && post.featured ? 'checked' : '' %>
+              class="w-5 h-5 rounded transition-all duration-300"
+              style="background-color: var(--current-line); border: 1px solid var(--border-color); accent-color: var(--cyan);"
+            />
+            <label for="featured" class="ml-3 text-sm font-light" style="color: var(--purple)">
+              Post Destacado
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div class="backdrop-blur-sm border rounded-lg p-6" style="background-color: rgba(40, 42, 54, 0.4); border-color: var(--border-color);">
+        <h2 class="text-xl font-light mb-6" style="color: var(--cyan)">Contenido *</h2>
+
+        <div>
+          <textarea
+            id="content"
+            name="content"
+            class="w-full"
+          ><%= post ? post.content : '' %></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 justify-end">
+        <a
+          href="/admin/dashboard"
+          class="px-6 py-3 rounded-lg font-mono font-light transition-all duration-300 hover:opacity-80"
+          style="background-color: rgba(255, 85, 85, 0.2); border: 1px solid var(--red); color: var(--red);"
+        >
+          Cancelar
+        </a>
+        <button
+          type="submit"
+          class="px-6 py-3 rounded-lg font-mono font-light transition-all duration-300 hover:opacity-80"
+          style="background-color: var(--green); color: var(--bg);"
+        >
+          <%= isEdit ? 'Actualizar Post' : 'Crear Post' %>
+        </button>
+      </div>
+
+    </form>
+
+  </section>
+
+  <script src="/theme.js"></script>
+
+  <script>
+    // Inicializar TinyMCE
+    tinymce.init({
+      selector: '#content',
+      height: 600,
+      skin: 'oxide-dark',
+      content_css: 'dark',
+      menubar: true,
+      plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'help', 'wordcount', 'codesample'
+      ],
+      toolbar: 'undo redo | blocks | ' +
+        'bold italic forecolor | alignleft aligncenter ' +
+        'alignright alignjustify | bullist numlist outdent indent | ' +
+        'removeformat | code | codesample | help',
+      content_style: `
+        body {
+          font-family: 'Courier New', monospace;
+          font-size: 14px;
+          background-color: #282a36;
+          color: #f8f8f2;
+        }
+        pre {
+          background-color: #1e1f29;
+          padding: 1rem;
+          border-radius: 8px;
+          overflow-x: auto;
+        }
+        code {
+          background-color: #1e1f29;
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+          font-family: 'Courier New', monospace;
+          color: #f1fa8c;
+        }
+      `,
+      codesample_languages: [
+        { text: 'HTML/XML', value: 'markup' },
+        { text: 'JavaScript', value: 'javascript' },
+        { text: 'CSS', value: 'css' },
+        { text: 'PHP', value: 'php' },
+        { text: 'Python', value: 'python' },
+        { text: 'Java', value: 'java' },
+        { text: 'C', value: 'c' },
+        { text: 'C#', value: 'csharp' },
+        { text: 'C++', value: 'cpp' },
+        { text: 'Bash', value: 'bash' },
+        { text: 'SQL', value: 'sql' },
+        { text: 'JSON', value: 'json' }
+      ]
+    });
+
+    // Auto-generate slug from title
+    const titleInput = document.querySelector('input[name="title"]');
+    const slugInput = document.querySelector('input[name="slug"]');
+
+    <% if (!isEdit) { %>
+    titleInput.addEventListener('input', function() {
+      const slug = this.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      slugInput.value = slug;
+    });
+    <% } %>
+  </script>
+
+</body>
+</html>

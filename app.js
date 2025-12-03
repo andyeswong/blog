@@ -4,16 +4,36 @@ try {
   // .env file optional - continue without it
 }
 const express = require('express');
+const session = require('express-session');
+const multer = require('multer');
 const path = require('path');
 const QRCode = require('qrcode');
 const postService = require('./services/postService');
 const difyService = require('./services/difyService');
+const { requireAuth, verifyPassword } = require('./middleware/auth');
 const app = express();
+
+// Configurar multer para subida de archivos
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB max
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configurar sesiones
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'awong-blog-secret-key-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 // 24 horas
+  }
+}));
 
 // Rutas
 app.get('/', (req, res) => {
@@ -341,6 +361,172 @@ app.get('/api/qr/:postId', async (req, res) => {
   }
 });
 
+// ==================== ADMIN ROUTES ====================
+
+// Admin login page
+app.get('/admin/login', (req, res) => {
+  if (req.session && req.session.isAuthenticated) {
+    return res.redirect('/admin/dashboard');
+  }
+  res.render('admin-login', { error: null });
+});
+
+// Admin login handler
+app.post('/admin/login', (req, res) => {
+  const { password } = req.body;
+
+  if (verifyPassword(password)) {
+    req.session.isAuthenticated = true;
+    return res.redirect('/admin/dashboard');
+  }
+
+  res.render('admin-login', { error: 'Contraseña incorrecta' });
+});
+
+// Admin logout
+app.get('/admin/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/admin/login');
+});
+
+// Admin dashboard
+app.get('/admin/dashboard', requireAuth, async (req, res) => {
+  try {
+    const posts = await postService.getAllPosts();
+    const stats = await postService.getPostsStats();
+
+    res.render('admin-dashboard', {
+      posts,
+      stats
+    });
+  } catch (error) {
+    console.error('Error loading dashboard:', error);
+    res.status(500).render('error', { message: 'Error cargando dashboard' });
+  }
+});
+
+// Admin create post page
+app.get('/admin/posts/new', requireAuth, (req, res) => {
+  let importedPost = null;
+
+  // Si viene de una importación, leer desde sesión
+  if (req.query.imported === 'true' && req.session.importedPostData) {
+    importedPost = req.session.importedPostData;
+    // Limpiar la sesión después de usar los datos
+    delete req.session.importedPostData;
+  }
+
+  res.render('admin-post-form', {
+    post: importedPost,
+    isEdit: false,
+    error: null,
+    isImported: !!importedPost
+  });
+});
+
+// Admin create post handler
+app.post('/admin/posts/new', requireAuth, async (req, res) => {
+  try {
+    const postData = req.body;
+
+    // Generar ID automáticamente
+    const generatedId = await postService.generateNextId(postData.slug);
+    postData.id = generatedId;
+
+    await postService.createPost(postData);
+    res.redirect('/admin/dashboard');
+  } catch (error) {
+    console.error('Error creating post:', error);
+    res.render('admin-post-form', {
+      post: req.body,
+      isEdit: false,
+      error: error.message,
+      isImported: false
+    });
+  }
+});
+
+// Admin edit post page
+app.get('/admin/posts/edit/:id', requireAuth, async (req, res) => {
+  try {
+    const post = await postService.getPostById(req.params.id);
+
+    if (!post) {
+      return res.status(404).render('error', { message: 'Post no encontrado' });
+    }
+
+    res.render('admin-post-form', {
+      post,
+      isEdit: true,
+      error: null,
+      isImported: false
+    });
+  } catch (error) {
+    console.error('Error loading post:', error);
+    res.status(500).render('error', { message: 'Error cargando post' });
+  }
+});
+
+// Admin update post handler
+app.post('/admin/posts/edit/:id', requireAuth, async (req, res) => {
+  try {
+    await postService.updatePost(req.params.id, req.body);
+    res.redirect('/admin/dashboard');
+  } catch (error) {
+    console.error('Error updating post:', error);
+    const post = await postService.getPostById(req.params.id);
+    res.render('admin-post-form', {
+      post: { ...post, ...req.body },
+      isEdit: true,
+      error: error.message,
+      isImported: false
+    });
+  }
+});
+
+// Admin delete post handler
+app.post('/admin/posts/delete/:id', requireAuth, async (req, res) => {
+  try {
+    await postService.deletePost(req.params.id);
+    res.redirect('/admin/dashboard');
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin import post from JSON
+app.post('/admin/posts/import', requireAuth, upload.single('jsonFile'), async (req, res) => {
+  console.log('📥 Ruta /admin/posts/import llamada');
+  console.log('File recibido:', req.file ? req.file.originalname : 'Sin archivo');
+
+  try {
+    if (!req.file) {
+      console.log('❌ No se recibió archivo');
+      return res.status(400).render('error', { message: 'No se proporcionó ningún archivo' });
+    }
+
+    // Parsear JSON
+    const jsonContent = req.file.buffer.toString('utf-8');
+    console.log('📄 Contenido JSON recibido (primeros 100 chars):', jsonContent.substring(0, 100));
+    const postData = JSON.parse(jsonContent);
+
+    // Validar que tenga los campos básicos
+    if (!postData.title || !postData.content) {
+      return res.status(400).render('error', { message: 'JSON inválido: falta título o contenido' });
+    }
+
+    // Guardar en sesión en lugar de query params
+    req.session.importedPostData = postData;
+
+    // Redirigir sin datos en URL
+    res.redirect('/admin/posts/new?imported=true');
+  } catch (error) {
+    console.error('Error importing JSON:', error);
+    res.status(400).render('error', { message: `Error al importar JSON: ${error.message}` });
+  }
+});
+
 // Página 404
 app.use((req, res) => {
   res.status(404).render('error', { message: 'Página no encontrada' });
@@ -349,4 +535,5 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`AWONG_blog running on http://localhost:${PORT}`);
+  console.log('✅ Ruta de importación registrada: POST /admin/posts/import');
 });
